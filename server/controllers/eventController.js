@@ -1,5 +1,6 @@
 const Event = require('../models/Event');
 const User = require('../models/User');
+const Notification = require('../models/Notification');
 
 const checkConflicts = async (date, startTime, endTime, venueId, facultyIds, staffIds, eventId = null) => {
     const query = { date: new Date(date) };
@@ -34,6 +35,13 @@ const createEvent = async (req, res) => {
         if (conflictError) return res.status(400).json({ message: conflictError });
 
         const event = await Event.create(req.body);
+        
+        await Notification.create({
+            title: 'New Event Scheduled',
+            message: `A new event "${event.title}" has been scheduled for ${new Date(event.date).toLocaleDateString()}.`,
+            type: 'event_created'
+        });
+
         res.status(201).json(event);
     } catch (error) { res.status(500).json({ message: error.message }); }
 };

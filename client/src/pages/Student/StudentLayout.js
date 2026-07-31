@@ -3,7 +3,8 @@ import { AuthContext } from '../../context/AuthContext';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LayoutDashboard, Compass, Ticket, QrCode, MessageSquare, User, Menu, Bell, Search, Moon, Sun, ChevronDown, LogOut } from 'lucide-react';
-import { Dropdown } from 'react-bootstrap';
+import { Dropdown, Badge } from 'react-bootstrap';
+import axios from 'axios';
 
 const StudentLayout = () => {
     const { user, logout } = useContext(AuthContext);
@@ -11,6 +12,17 @@ const StudentLayout = () => {
     const location = useLocation();
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [theme, setTheme] = useState(localStorage.getItem('evezen_theme') || 'light');
+    const [notifications, setNotifications] = useState([]);
+
+    useEffect(() => {
+        if (user?.token) {
+            axios.get('http://localhost:5000/api/notifications', {
+                headers: { Authorization: `Bearer ${user.token}` }
+            })
+            .then(res => setNotifications(res.data))
+            .catch(err => console.error(err));
+        }
+    }, [user]);
 
     useEffect(() => {
         if (theme === 'dark') {
@@ -99,10 +111,41 @@ const StudentLayout = () => {
                         <button onClick={toggleTheme} className="btn btn-light p-2 rounded-circle d-flex align-items-center justify-content-center" style={{ width: '40px', height: '40px' }}>
                              {theme === 'dark' ? <Sun size={20} className="text-muted" /> : <Moon size={20} className="text-muted" />}
                         </button>
-                        <button className="btn btn-light p-2 rounded-circle d-flex align-items-center justify-content-center position-relative" style={{ width: '40px', height: '40px' }}>
-                            <Bell size={20} className="text-muted" />
-                            <span className="position-absolute translate-middle p-1 bg-danger border border-light rounded-circle" style={{ top: '8px', right: '4px' }}></span>
-                        </button>
+                        <Dropdown align="end">
+                            <Dropdown.Toggle as="button" className="btn btn-light p-0 rounded-circle d-flex align-items-center justify-content-center position-relative border-0" style={{ width: '40px', height: '40px', background: 'transparent' }} id="dropdown-notifications">
+                                <div className="btn btn-light p-2 rounded-circle d-flex align-items-center justify-content-center w-100 h-100">
+                                    <Bell size={20} className="text-muted" />
+                                    {notifications.length > 0 && <span className="position-absolute p-1 bg-danger border border-light rounded-circle" style={{ top: '8px', right: '4px' }}></span>}
+                                </div>
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu className="shadow border-0 rounded-3 mt-3 p-0" style={{ minWidth: '320px', overflow: 'hidden' }}>
+                                <div className="p-3 bg-light border-bottom d-flex justify-content-between align-items-center">
+                                    <h6 className="mb-0 fw-bold">Notifications</h6>
+                                    <Badge bg="primary" pill>{notifications.length} New</Badge>
+                                </div>
+                                <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                                    {notifications.length === 0 ? (
+                                        <div className="p-4 text-center text-muted">No notifications yet.</div>
+                                    ) : (
+                                        notifications.map(n => (
+                                            <Dropdown.Item key={n._id} className="p-3 border-bottom d-flex align-items-start gap-3" style={{ whiteSpace: 'normal' }}>
+                                                <div className="bg-primary bg-opacity-10 p-2 rounded-circle text-primary flex-shrink-0">
+                                                    <Bell size={16} />
+                                                </div>
+                                                <div>
+                                                    <div className="fw-semibold text-dark" style={{ fontSize: '0.9rem' }}>{n.title}</div>
+                                                    <div className="text-muted" style={{ fontSize: '0.8rem' }}>{n.message}</div>
+                                                    <div className="text-muted mt-1" style={{ fontSize: '0.7rem' }}>{new Date(n.createdAt).toLocaleString()}</div>
+                                                </div>
+                                            </Dropdown.Item>
+                                        ))
+                                    )}
+                                </div>
+                                <div className="p-2 text-center bg-light border-top">
+                                    <small className="text-primary fw-medium" style={{ cursor: 'pointer' }}>Mark all as read</small>
+                                </div>
+                            </Dropdown.Menu>
+                        </Dropdown>
                         <div style={{ width: '1px', height: '24px', backgroundColor: 'rgba(0,0,0,0.1)' }}></div>
                         <Dropdown align="end">
                             <Dropdown.Toggle variant="link" className="text-decoration-none d-flex align-items-center gap-3 p-0 border-0 text-dark" id="dropdown-user">

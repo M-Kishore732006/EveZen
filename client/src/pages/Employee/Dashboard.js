@@ -39,11 +39,11 @@ const EmployeeDashboard = () => {
     return (
         <motion.div variants={containerVariants} initial="hidden" animate="show" className="h-100">
             <motion.div variants={itemVariants}>
-                <Card className="border-0 shadow-sm mb-4 bg-white overflow-hidden">
+                <Card className="border-0 shadow-sm mb-4 overflow-hidden">
                     <div className="p-5 d-flex justify-content-between align-items-center flex-wrap gap-4 position-relative">
                         <div style={{ position: 'absolute', right: '0', top: '0', height: '100%', width: '400px', background: 'linear-gradient(270deg, rgba(108, 99, 255, 0.1) 0%, rgba(255,255,255,0) 100%)', zIndex: 0 }}></div>
                         <div style={{ zIndex: 1 }}>
-                            <h2 className="fw-bold mb-2 text-dark">Welcome back, {user?.name.split(' ')[0]}</h2>
+                            <h2 className="fw-bold mb-2">Welcome back, {user?.name.split(' ')[0]}</h2>
                             <p className="mb-0 text-muted fs-5">You have {stats.assigned} active assignments requiring your coordination today.</p>
                         </div>
                         <Button variant="primary" size="lg" className="px-4 shadow-sm z-1" onClick={() => navigate(`${basePath}/assigned`)}>
@@ -70,7 +70,7 @@ const EmployeeDashboard = () => {
                                     <stat.icon size={36} />
                                 </div>
                                 <div>
-                                    <h2 className="fw-bold mb-1 text-dark" style={{ fontSize: '2.5rem' }}>{stat.value}</h2>
+                                    <h2 className="fw-bold mb-1" style={{ fontSize: '2.5rem' }}>{stat.value}</h2>
                                     <span className="text-muted fw-bold text-uppercase" style={{ fontSize: '0.8rem', letterSpacing: '0.5px' }}>{stat.label}</span>
                                 </div>
                             </Card>
@@ -85,9 +85,8 @@ const EmployeeDashboard = () => {
                         <Card className="border-0 shadow-sm p-4 h-100">
                             <div className="d-flex justify-content-between align-items-center mb-4">
                                 <h5 className="fw-bold mb-0">Today's Schedule</h5>
-                                {isStaff && <Badge bg="light" text="dark" className="border">Shift: Morning</Badge>}
+                                {isStaff && <Badge bg="light" className="border text-body text-dark-override">Shift: Morning</Badge>}
                             </div>
-                            
                             <div className="d-grid gap-3">
                                 {assignedEvents.length === 0 ? (
                                     <div className="text-center py-5">
@@ -96,9 +95,9 @@ const EmployeeDashboard = () => {
                                     </div>
                                 ) : (
                                     assignedEvents.map(ev => (
-                                        <div key={ev._id} className="p-3 bg-light rounded d-flex justify-content-between align-items-center flex-wrap gap-3" style={{ borderLeft: '4px solid var(--accent-color)' }}>
+                                        <div key={ev._id} className="p-3 rounded d-flex justify-content-between align-items-center flex-wrap gap-3 event-card-bg" style={{ borderLeft: '4px solid var(--accent-color)' }}>
                                             <div>
-                                                <h6 className="fw-bold mb-1 text-dark">{ev.title}</h6>
+                                                <h6 className="fw-bold mb-1">{ev.title}</h6>
                                                 <div className="text-muted small d-flex gap-3">
                                                     <span className="d-flex align-items-center gap-1"><Clock size={12}/> {ev.startTime} - {ev.endTime}</span>
                                                     <span className="d-flex align-items-center gap-1"><MapPin size={12}/> {ev.venue?.name || 'TBA'}</span>

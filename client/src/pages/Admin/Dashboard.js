@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Row, Col, Card, Modal, Button } from 'react-bootstrap';
-import { Calendar as CalendarIcon, Clock, MapPin, Users, NotebookText, TrendingUp, Plus } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Calendar as CalendarIcon, Clock, MapPin, Users, NotebookText, TrendingUp, Plus, ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // FullCalendar Imports
 import FullCalendar from '@fullcalendar/react';
@@ -12,6 +12,11 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 
 const Dashboard = () => {
+    const calendarRef = useRef(null);
+    const [currentDateTitle, setCurrentDateTitle] = useState('');
+    const [currentView, setCurrentView] = useState('dayGridMonth');
+    const [searchQuery, setSearchQuery] = useState('');
+
     const { user } = useContext(AuthContext);
     const navigate = useNavigate();
     const [stats, setStats] = useState({ eventsToday: 0, upcomingEvents: 0, totalFaculty: 0, totalStaff: 0 });
@@ -51,8 +56,54 @@ const Dashboard = () => {
         };
     });
 
+    const filteredEvents = calendarEvents.filter(ev => ev.title.toLowerCase().includes(searchQuery.toLowerCase()));
+
     const handleEventClick = (info) => {
         setSelectedEvent(info.event.extendedProps);
+    };
+
+    const handlePrev = () => {
+        const api = calendarRef.current.getApi();
+        api.prev();
+        setCurrentDateTitle(api.view.title);
+    };
+
+    const handleNext = () => {
+        const api = calendarRef.current.getApi();
+        api.next();
+        setCurrentDateTitle(api.view.title);
+    };
+
+    const handleToday = () => {
+        const api = calendarRef.current.getApi();
+        api.today();
+        setCurrentDateTitle(api.view.title);
+    };
+
+    const handleViewChange = (viewName) => {
+        const api = calendarRef.current.getApi();
+        api.changeView(viewName);
+        setCurrentView(viewName);
+        setCurrentDateTitle(api.view.title);
+    };
+
+    const handleDatesSet = (dateInfo) => {
+        setCurrentDateTitle(dateInfo.view.title);
+    };
+
+    const renderEventContent = (eventInfo) => {
+        const isPast = eventInfo.event.start < new Date();
+        const statusColor = isPast ? '#94A3B8' : (eventInfo.event.start <= new Date() && eventInfo.event.end >= new Date() ? 'var(--success-color, #10B981)' : 'var(--accent-color, #6C63FF)');
+        
+        return (
+            <div className="custom-event-card" style={{ borderLeftColor: statusColor }}>
+                <div className="d-flex justify-content-between align-items-center mb-1">
+                    <div className="custom-event-title">{eventInfo.event.title}</div>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: statusColor }}></div>
+                </div>
+                <div className="custom-event-time">{eventInfo.timeText}</div>
+            </div>
+        );
     };
 
     const containerVariants = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.1 } } };
@@ -105,20 +156,48 @@ const Dashboard = () => {
             <Row>
                 <Col lg={8} className="mb-4">
                     <motion.div variants={itemVariants} className="h-100">
-                        <Card className="p-4 border-0 shadow-sm h-100">
-                            <h5 className="mb-4 fw-bold">Event Calendar</h5>
-                            <div className="flex-grow-1" style={{ minHeight: '500px' }}>
+                        <Card className="p-0 border-0 shadow-sm h-100" style={{ borderRadius: '20px', overflow: 'hidden' }}>
+                            <div className="p-4 border-bottom d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 bg-white" style={{ backgroundColor: 'var(--card-bg)' }}>
+                                <div className="d-flex align-items-center gap-3">
+                                    <div className="d-flex bg-light rounded-pill p-1">
+                                        <button className="btn btn-sm border-0 rounded-circle d-flex align-items-center justify-content-center p-2 calendar-nav-btn" onClick={handlePrev}><ChevronLeft size={18} /></button>
+                                        <button className="btn btn-sm border-0 rounded-circle d-flex align-items-center justify-content-center p-2 calendar-nav-btn" onClick={handleNext}><ChevronRight size={18} /></button>
+                                    </div>
+                                    <h4 className="mb-0 fw-bold d-flex align-items-center gap-2" style={{ color: 'var(--primary-color)' }}>
+                                        📅 {currentDateTitle || 'Calendar'}
+                                    </h4>
+                                </div>
+                                <div className="d-flex align-items-center gap-3 flex-wrap">
+                                    <div className="position-relative">
+                                        <Search size={16} className="position-absolute text-muted" style={{ left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+                                        <input 
+                                            type="text" 
+                                            className="form-control form-control-sm rounded-pill" 
+                                            placeholder="Search events..." 
+                                            style={{ paddingLeft: '36px', width: '200px', backgroundColor: 'var(--bg-color)', border: 'none' }}
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                        />
+                                    </div>
+                                    <button className="btn btn-sm btn-light rounded-pill px-3 fw-medium" onClick={handleToday}>Today</button>
+                                    <div className="d-flex bg-light rounded-pill p-1">
+                                        <button className={`btn btn-sm border-0 rounded-pill px-3 py-1 fw-medium ${currentView === 'dayGridMonth' ? 'btn-white shadow-sm text-primary' : 'text-muted'}`} onClick={() => handleViewChange('dayGridMonth')}>Month</button>
+                                        <button className={`btn btn-sm border-0 rounded-pill px-3 py-1 fw-medium ${currentView === 'dayGridWeek' ? 'btn-white shadow-sm text-primary' : 'text-muted'}`} onClick={() => handleViewChange('dayGridWeek')}>Week</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex-grow-1 p-4" style={{ minHeight: '600px', backgroundColor: 'var(--card-bg)' }}>
                                 <FullCalendar
+                                    ref={calendarRef}
                                     plugins={[dayGridPlugin, interactionPlugin]}
                                     initialView="dayGridMonth"
-                                    events={calendarEvents}
+                                    events={filteredEvents}
                                     eventClick={handleEventClick}
-                                    headerToolbar={{ left: 'prev,next today', center: 'title', right: 'dayGridMonth,dayGridWeek' }}
+                                    datesSet={handleDatesSet}
+                                    headerToolbar={false}
                                     height="100%"
                                     eventTimeFormat={{ hour: 'numeric', minute: '2-digit', meridiem: 'short' }}
-                                    eventDisplay="block"
-                                    eventBackgroundColor="var(--accent-color)"
-                                    eventBorderColor="var(--accent-color)"
+                                    eventContent={renderEventContent}
                                 />
                             </div>
                         </Card>
@@ -152,11 +231,17 @@ const Dashboard = () => {
             </Row>
 
             {/* Premium Event Details Modal */}
-            <Modal show={!!selectedEvent} onHide={() => setSelectedEvent(null)} centered size="md">
-                <Modal.Header closeButton style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', padding: '1.5rem', borderRadius: '16px 16px 0 0' }}>
-                    <Modal.Title style={{ fontWeight: 700, color: 'var(--primary-color)' }}>{selectedEvent?.title}</Modal.Title>
+            <Modal show={!!selectedEvent} onHide={() => setSelectedEvent(null)} centered size="md" className="premium-modal">
+                <div style={{ height: '80px', backgroundColor: 'var(--accent-color)', borderRadius: '16px 16px 0 0', position: 'relative', overflow: 'hidden' }}>
+                    <div style={{ position: 'absolute', top: '-50%', left: '-20%', width: '150%', height: '200%', background: 'linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.1) 75%, transparent 75%, transparent)' , backgroundSize: '20px 20px', opacity: 0.3 }}></div>
+                </div>
+                <Modal.Header closeButton style={{ borderBottom: 'none', padding: '1rem', marginTop: '-40px', position: 'relative', zIndex: 1, backgroundColor: 'transparent' }} className="border-0 pb-0">
+                    <div className="bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center p-3 mb-2" style={{ width: '60px', height: '60px', border: '4px solid var(--card-bg)' }}>
+                        <CalendarIcon size={24} color="var(--accent-color)" />
+                    </div>
                 </Modal.Header>
-                <Modal.Body className="p-4">
+                <Modal.Body className="px-4 pb-4 pt-2">
+                    <h4 style={{ fontWeight: 700, color: 'var(--primary-color)' }} className="mb-3">{selectedEvent?.title}</h4>
                     {selectedEvent?.description && (
                         <div className="p-3 mb-4 rounded" style={{ backgroundColor: 'rgba(108, 99, 255, 0.05)', color: 'var(--accent-color)' }}>
                             <NotebookText size={18} className="me-2"/> <span style={{ fontSize: '0.95rem' }}>{selectedEvent.description}</span>

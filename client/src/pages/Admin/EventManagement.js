@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Card, Button, Modal, Form, Alert, Badge } from 'react-bootstrap';
 import { Edit, Trash, Plus, Calendar, Clock, MapPin, Users, Info } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Select from 'react-select';
 
 const EventManagement = () => {
     const { user } = useContext(AuthContext);
@@ -207,16 +208,26 @@ const EventManagement = () => {
                                 <Form.Control as="textarea" rows={2} placeholder="Provide a brief overview..." value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
                             </div>
                             <div className="col-md-6 mb-2">
-                                <Form.Label className="fw-medium text-muted small text-uppercase">Assign Faculty (Select Multiple)</Form.Label>
-                                <Form.Select multiple value={formData.assignedFaculty} onChange={e => setFormData({...formData, assignedFaculty: Array.from(e.target.selectedOptions, option => option.value)})} style={{ height: '120px' }}>
-                                    {facultyList.map(f => <option key={f._id} value={f._id}>{f.name}</option>)}
-                                </Form.Select>
+                                <Form.Label className="fw-medium text-muted small text-uppercase">Assign Faculty</Form.Label>
+                                <Select 
+                                    isMulti
+                                    options={facultyList.map(f => ({ value: f._id, label: f.name }))}
+                                    value={facultyList.filter(f => formData.assignedFaculty.includes(f._id)).map(f => ({ value: f._id, label: f.name }))}
+                                    onChange={(selected) => setFormData({...formData, assignedFaculty: selected.map(s => s.value)})}
+                                    placeholder="Search and select faculty..."
+                                    styles={{ control: (base) => ({ ...base, borderRadius: '8px', minHeight: '44px' }) }}
+                                />
                             </div>
                             <div className="col-md-6 mb-2">
-                                <Form.Label className="fw-medium text-muted small text-uppercase">Assign Staff (Select Multiple)</Form.Label>
-                                <Form.Select multiple value={formData.assignedStaff} onChange={e => setFormData({...formData, assignedStaff: Array.from(e.target.selectedOptions, option => option.value)})} style={{ height: '120px' }}>
-                                    {staffList.map(s => <option key={s._id} value={s._id}>{s.name} ({s.workType})</option>)}
-                                </Form.Select>
+                                <Form.Label className="fw-medium text-muted small text-uppercase">Assign Support Staff</Form.Label>
+                                <Select 
+                                    isMulti
+                                    options={staffList.map(s => ({ value: s._id, label: `${s.name} (${s.workType})` }))}
+                                    value={staffList.filter(s => formData.assignedStaff.includes(s._id)).map(s => ({ value: s._id, label: `${s.name} (${s.workType})` }))}
+                                    onChange={(selected) => setFormData({...formData, assignedStaff: selected.map(s => s.value)})}
+                                    placeholder="Search and select staff..."
+                                    styles={{ control: (base) => ({ ...base, borderRadius: '8px', minHeight: '44px' }) }}
+                                />
                             </div>
                         </div>
                     </Form>

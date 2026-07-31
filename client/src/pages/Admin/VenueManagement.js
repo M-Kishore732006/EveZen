@@ -100,7 +100,7 @@ const VenueManagement = () => {
             </div>
 
             {/* Filter Section */}
-            <Card className="p-4 mb-4 shadow-sm border-0 bg-white">
+            <Card className="p-4 mb-4 shadow-sm border-0">
                 <Form onSubmit={checkAvailability} className="d-flex align-items-end gap-3 flex-wrap">
                     <div>
                         <Form.Label className="text-muted small fw-bold text-uppercase mb-1">Check Date</Form.Label>
@@ -122,7 +122,7 @@ const VenueManagement = () => {
             </Card>
             
             <Card className="flex-grow-1 p-0 shadow-sm border-0 d-flex flex-column" style={{ overflow: 'hidden' }}>
-                <div className="flex-grow-1 p-4" style={{ backgroundColor: '#f8f9fb', overflowY: 'auto' }}>
+                <div className="flex-grow-1 p-4 event-card-bg" style={{ overflowY: 'auto' }}>
                     
                     {/* Render Booked Venues if query exists */}
                     {detailedVenues.booked.length > 0 && (
@@ -197,7 +197,7 @@ const VenueManagement = () => {
             </Card>
 
             <Modal show={showModal} onHide={() => setShowModal(false)} centered>
-                <Modal.Header closeButton style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', padding: '1.5rem', backgroundColor: '#f8f9fb', borderRadius: '16px 16px 0 0' }}>
+                <Modal.Header closeButton style={{ borderBottom: '1px solid var(--border-color, rgba(0,0,0,0.05))', padding: '1.5rem', borderRadius: '16px 16px 0 0' }} className="event-card-bg">
                     <Modal.Title style={{ fontWeight: 700, color: 'var(--primary-color)' }}>{formData.id ? 'Edit Space Entry' : 'Register New Space'}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body className="p-4">

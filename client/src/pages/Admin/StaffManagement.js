@@ -113,7 +113,7 @@ const StaffManagement = () => {
                     className="border-0 px-4 py-2" 
                     style={{ 
                         borderRadius: '8px', 
-                        backgroundColor: activeTab === 'faculty' ? '#fff' : 'transparent', 
+                        backgroundColor: activeTab === 'faculty' ? 'var(--card-bg)' : 'transparent', 
                         color: activeTab === 'faculty' ? 'var(--primary-color)' : 'var(--text-muted)',
                         fontWeight: activeTab === 'faculty' ? 600 : 500,
                         boxShadow: activeTab === 'faculty' ? '0 2px 10px rgba(0,0,0,0.05)' : 'none',
@@ -127,7 +127,7 @@ const StaffManagement = () => {
                     className="border-0 px-4 py-2" 
                     style={{ 
                         borderRadius: '8px', 
-                        backgroundColor: activeTab === 'staff' ? '#fff' : 'transparent', 
+                        backgroundColor: activeTab === 'staff' ? 'var(--card-bg)' : 'transparent', 
                         color: activeTab === 'staff' ? 'var(--primary-color)' : 'var(--text-muted)',
                         fontWeight: activeTab === 'staff' ? 600 : 500,
                         boxShadow: activeTab === 'staff' ? '0 2px 10px rgba(0,0,0,0.05)' : 'none',
@@ -140,7 +140,7 @@ const StaffManagement = () => {
             </div>
 
             <Card className="flex-grow-1 p-0 shadow-sm border-0 d-flex flex-column" style={{ overflow: 'hidden' }}>
-                <div className="bg-light px-4 py-3 d-flex" style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                <div className="event-card-bg px-4 py-3 d-flex" style={{ borderBottom: '1px solid var(--border-color, rgba(0,0,0,0.05))', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                     <div style={{ flex: '2 1 0' }}>Profile</div>
                     <div style={{ flex: '1.5 1 0' }}>Contact</div>
                     {activeTab === 'staff' && <div style={{ flex: '1 1 0' }}>Work Type</div>}
@@ -158,7 +158,7 @@ const StaffManagement = () => {
                     ) : (
                         <motion.div key={activeTab} variants={containerVariants} initial="hidden" animate="show">
                             {activeList.map(item => (
-                                <motion.div variants={itemVariants} key={item._id} className="px-4 py-3 border-bottom d-flex align-items-center" style={{ transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8f9fb'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+                                <motion.div variants={itemVariants} key={item._id} className="px-4 py-3 border-bottom d-flex align-items-center" style={{ transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--hover-bg, rgba(0,0,0,0.02))'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
                                     <div style={{ flex: '2 1 0' }} className="d-flex align-items-center gap-3">
                                         <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'rgba(108, 99, 255, 0.1)', color: 'var(--accent-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
                                             {item.name.charAt(0)}
@@ -201,7 +201,7 @@ const StaffManagement = () => {
             </Card>
 
             <Modal show={showModal} onHide={() => setShowModal(false)} centered>
-                <Modal.Header closeButton style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', padding: '1.5rem', backgroundColor: '#f8f9fb', borderRadius: '16px 16px 0 0' }}>
+                <Modal.Header closeButton style={{ borderBottom: '1px solid var(--border-color, rgba(0,0,0,0.05))', padding: '1.5rem', borderRadius: '16px 16px 0 0' }} className="event-card-bg">
                     <Modal.Title style={{ fontWeight: 700, color: 'var(--primary-color)' }}>{formData.id ? 'Edit Profile' : 'Register Member'}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body className="p-4">

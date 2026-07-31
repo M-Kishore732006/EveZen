@@ -168,8 +168,16 @@ body {
 .fc {
   font-family: 'Inter', sans-serif;
 }
-.fc-theme-standard td, .fc-theme-standard th {
-  border-color: rgba(0,0,0,0.04) !important;
+.fc-scrollgrid {
+  border: none !important;
+}
+.fc-theme-standard th {
+  border: none !important;
+  border-bottom: 1px solid rgba(0,0,0,0.04) !important;
+  padding: 12px 0 !important;
+}
+.fc-theme-standard td {
+  border: 1px dashed rgba(0,0,0,0.04) !important;
 }
 .fc-toolbar-title {
   font-size: 1.25rem !important;
@@ -226,6 +234,7 @@ body.dark-theme {
   --card-bg: #1E293B;
   --border-color: rgba(255, 255, 255, 0.05);
   --nav-active-bg: rgba(255, 255, 255, 0.1);
+  color-scheme: dark;
 }
 
 body.dark-theme .text-muted {
@@ -278,23 +287,179 @@ body.dark-theme .form-select:focus {
   color: #F8FAFC;
 }
 
+body.dark-theme .form-control::placeholder,
+body.dark-theme .form-select::placeholder {
+  color: rgba(248, 250, 252, 0.4) !important;
+}
+
+body.dark-theme .bg-light {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  color: #F8FAFC !important;
+}
+
+body.dark-theme .text-dark {
+  color: #F8FAFC !important;
+}
+
 body.dark-theme header.bg-white {
   background-color: #1E293B !important;
   border-bottom-color: rgba(255,255,255,0.05) !important;
 }
 
-/* FullCalendar Dark Overrides */
-body.dark-theme .fc-theme-standard td, 
-body.dark-theme .fc-theme-standard th {
-  border-color: rgba(255,255,255,0.05) !important;
-}
-
-body.dark-theme .fc-button-primary {
+body.dark-theme .dropdown-menu {
+  background-color: var(--bg-color) !important;
   border-color: rgba(255,255,255,0.1) !important;
 }
 
-body.dark-theme .fc .fc-daygrid-day.fc-day-today {
-  background-color: rgba(129, 140, 248, 0.1);
+body.dark-theme .dropdown-item {
+  color: #F8FAFC !important;
+}
+
+body.dark-theme .dropdown-item:hover {
+  background-color: rgba(255,255,255,0.1) !important;
+}
+
+body.dark-theme .text-body,
+body.dark-theme .text-black {
+  color: #F8FAFC !important;
+}
+
+/* Premium FullCalendar Overrides (Light & Dark Unified) */
+.fc-theme-standard th, .fc-theme-standard td, .fc-theme-standard .fc-scrollgrid {
+  border: none !important;
+}
+
+.fc .fc-col-header-cell {
+  background-color: transparent !important;
+  color: var(--text-muted) !important;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(0,0,0,0.05) !important;
+}
+
+body.dark-theme .fc .fc-col-header-cell {
+  border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+}
+
+.fc-daygrid-day {
+  padding: 4px !important;
+  border-right: 1px dashed rgba(0,0,0,0.05) !important;
+  border-bottom: 1px dashed rgba(0,0,0,0.05) !important;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  border-radius: 12px;
+}
+
+body.dark-theme .fc-theme-standard td {
+  border-right: 1px dashed rgba(255,255,255,0.05) !important;
+  border-bottom: 1px dashed rgba(255,255,255,0.05) !important;
+}
+
+.fc-daygrid-day:hover {
+  background-color: var(--nav-active-bg, rgba(108, 99, 255, 0.05));
+  cursor: pointer;
+}
+
+.fc .fc-daygrid-day-number {
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 8px 12px !important;
+  float: left;
+  color: var(--text-dark);
+}
+
+body.dark-theme .fc .fc-daygrid-day-number {
+  color: #F8FAFC !important;
+}
+
+.fc-day-today {
+  background-color: transparent !important;
+}
+
+.fc .fc-day-today .fc-daygrid-day-number {
+  background-color: var(--accent-color) !important;
+  color: #fff !important;
+  border-radius: 50% !important;
+  width: 32px !important;
+  height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  margin: 6px !important;
+}
+
+.fc-day-other .fc-daygrid-day-number {
+  opacity: 0.3;
+}
+
+.fc .fc-event {
+  background: transparent !important;
+  border: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Custom Mini Event Cards */
+.custom-event-card {
+  background-color: var(--card-bg);
+  border-left: 4px solid var(--accent-color);
+  border-radius: 6px;
+  padding: 6px 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+  transition: all 0.2s ease;
+  margin-bottom: 4px;
+  display: flex;
+  flex-direction: column;
+}
+
+.custom-event-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  border-left-width: 6px;
+}
+
+.custom-event-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+
+body.dark-theme .custom-event-card {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+body.dark-theme .custom-event-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+.custom-event-time {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+/* Custom Calendar Header Buttons */
+.calendar-nav-btn {
+  color: var(--text-muted);
+  transition: all 0.2s;
+  background: transparent;
+}
+.calendar-nav-btn:hover {
+  background-color: var(--accent-color) !important;
+  color: #fff !important;
+}
+.btn-white {
+  background-color: #fff;
+}
+body.dark-theme .btn-white {
+  background-color: #334155;
+  color: #fff !important;
 }
 
 body.dark-theme .modal-content {

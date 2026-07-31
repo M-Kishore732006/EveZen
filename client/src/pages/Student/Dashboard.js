@@ -57,7 +57,7 @@ const Dashboard = () => {
                         <motion.div variants={itemVariants}>
                             <Card className="p-4 border-0 shadow-sm h-100 position-relative overflow-hidden">
                                 <div className={`position-absolute top-0 end-0 p-3 opacity-10 ${stat.color}`}>
-                                    <stat.icon size={80} style={{ transform: 'translate(20%, -20%)' }} />
+                                    <stat.icon size={60} style={{ transform: 'translate(10%, -10%)' }} />
                                 </div>
                                 <div className="d-flex align-items-center gap-3 mb-3">
                                     <div className={`p-2 rounded ${stat.badge} bg-opacity-10 ${stat.color}`}>
@@ -65,7 +65,7 @@ const Dashboard = () => {
                                     </div>
                                     <span className="text-muted fw-bold text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>{stat.label}</span>
                                 </div>
-                                <h2 className="fw-bold mb-0 text-dark" style={{ fontSize: '2.5rem' }}>{stat.value}</h2>
+                                <h2 className="fw-bold mb-0" style={{ fontSize: '2.5rem' }}>{stat.value}</h2>
                             </Card>
                         </motion.div>
                     </Col>
@@ -105,11 +105,11 @@ const Dashboard = () => {
                             <div className="d-grid gap-3">
                                 <Button variant="light" className="text-start p-3 d-flex align-items-center gap-3 border shadow-none" onClick={() => navigate('/student/qr')}>
                                     <div className="bg-primary bg-opacity-10 p-2 rounded text-primary"><QrCode size={20}/></div>
-                                    <span className="fw-medium text-dark">Scan Event QR</span>
+                                    <span className="fw-medium">Scan Event QR</span>
                                 </Button>
                                 <Button variant="light" className="text-start p-3 d-flex align-items-center gap-3 border shadow-none" onClick={() => navigate('/student/forums')}>
                                     <div className="bg-warning bg-opacity-10 p-2 rounded text-warning"><MessageSquare size={20}/></div>
-                                    <span className="fw-medium text-dark">Join Discussions</span>
+                                    <span className="fw-medium">Join Discussions</span>
                                 </Button>
                             </div>
                         </Card>
