@@ -1,13 +1,90 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@import "bootstrap/dist/css/bootstrap.min.css";
+
+:root {
+  --primary-color: #321E48;
+  --secondary-color: #43637E;
+  --text-dark: #464858;
+  --bg-color: #F8F9FA;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+body {
+  background-color: var(--bg-color);
+  color: var(--text-dark);
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.card {
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+.card-header {
+  background-color: transparent;
+  color: var(--text-dark);
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  font-weight: 600;
+  padding: 1.25rem 1.5rem;
+  border-radius: 16px 16px 0 0 !important;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  border-radius: 8px;
+  padding: 0.5rem 1.5rem;
+  font-weight: 500;
+}
+
+.btn-primary:hover {
+  background-color: #40275c;
+  border-color: #40275c;
+}
+
+.btn-secondary {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+  border-radius: 8px;
+}
+
+.sidebar {
+  background-color: #ffffff;
+  min-height: 100vh;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+}
+
+.sidebar .nav-link {
+  color: var(--text-dark);
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  margin: 0.25rem 1rem;
+}
+
+.sidebar .nav-link:hover, .sidebar .nav-link.active {
+  background-color: rgba(50, 30, 72, 0.05);
+  color: var(--primary-color);
+}
+
+.topbar {
+  background-color: #ffffff;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+}
+
+.table {
+  vertical-align: middle;
+}
+
+.table th {
+  color: var(--text-dark);
+  font-weight: 600;
+  border-bottom: 2px solid rgba(0,0,0,0.05);
 }
