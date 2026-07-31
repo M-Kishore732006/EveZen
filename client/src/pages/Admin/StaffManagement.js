@@ -55,10 +55,13 @@ const StaffManagement = () => {
         setError('');
         try {
             const endpoint = activeTab === 'faculty' ? 'faculty' : 'staff';
+            const payload = { ...formData };
+            if (!payload.workType) delete payload.workType;
+
             if (formData.id) {
-                await axios.put(`http://localhost:5000/api/users/${endpoint}/${formData.id}`, formData, { headers: { Authorization: `Bearer ${user.token}` } });
+                await axios.put(`http://localhost:5000/api/users/${endpoint}/${formData.id}`, payload, { headers: { Authorization: `Bearer ${user.token}` } });
             } else {
-                await axios.post(`http://localhost:5000/api/users/${endpoint}`, formData, { headers: { Authorization: `Bearer ${user.token}` } });
+                await axios.post(`http://localhost:5000/api/users/${endpoint}`, payload, { headers: { Authorization: `Bearer ${user.token}` } });
             }
             setShowModal(false);
             fetchUsers();

@@ -84,7 +84,7 @@ const Dashboard = () => {
                 ].map((stat, idx) => (
                     <Col lg={3} sm={6} key={idx} className="mb-3">
                         <motion.div variants={itemVariants}>
-                            <Card className="p-4 h-100 border-0 shadow-sm" style={{ backgroundColor: '#fff' }}>
+                            <Card className="p-4 h-100 border-0 shadow-sm">
                                 <div className="d-flex justify-content-between align-items-start mb-3">
                                     <div className={`glass-icon ${stat.color}`}>
                                         <stat.icon size={24} />
@@ -139,7 +139,7 @@ const Dashboard = () => {
                                             {idx !== 4 && <div style={{ width: '2px', height: '100%', backgroundColor: 'rgba(0,0,0,0.05)', position: 'absolute', top: '12px', left: '5px' }}></div>}
                                         </div>
                                         <div>
-                                            <p className="mb-1 fw-semibold text-dark" style={{ fontSize: '0.95rem' }}>{ev.title}</p>
+                                            <p className="mb-1 fw-semibold" style={{ fontSize: '0.95rem' }}>{ev.title}</p>
                                             <p className="text-muted mb-0" style={{ fontSize: '0.85rem' }}>Scheduled for {new Date(ev.date).toLocaleDateString()} at {ev.startTime}</p>
                                         </div>
                                     </div>
@@ -153,7 +153,7 @@ const Dashboard = () => {
 
             {/* Premium Event Details Modal */}
             <Modal show={!!selectedEvent} onHide={() => setSelectedEvent(null)} centered size="md">
-                <Modal.Header closeButton style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', padding: '1.5rem', backgroundColor: '#f8f9fb', borderRadius: '16px 16px 0 0' }}>
+                <Modal.Header closeButton style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', padding: '1.5rem', borderRadius: '16px 16px 0 0' }}>
                     <Modal.Title style={{ fontWeight: 700, color: 'var(--primary-color)' }}>{selectedEvent?.title}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body className="p-4">
@@ -202,7 +202,7 @@ const Dashboard = () => {
                         </Row>
                     </div>
                 </Modal.Body>
-                <Modal.Footer style={{ borderTop: 'none', padding: '1.5rem', backgroundColor: '#f8f9fb', borderRadius: '0 0 16px 16px' }}>
+                <Modal.Footer style={{ borderTop: 'none', padding: '1.5rem', borderRadius: '0 0 16px 16px' }}>
                     <Button variant="light" onClick={() => setSelectedEvent(null)} className="w-100">Close</Button>
                 </Modal.Footer>
             </Modal>

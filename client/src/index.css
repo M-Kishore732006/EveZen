@@ -13,6 +13,8 @@
   --radius-lg: 20px;
   --radius-md: 12px;
   --transition: all 0.3s ease;
+  --border-color: rgba(0, 0, 0, 0.04);
+  --nav-active-bg: rgba(108, 99, 255, 0.08);
 }
 
 body {
@@ -163,31 +165,145 @@ body {
 }
 
 /* FullCalendar Resets */
+.fc {
+  font-family: 'Inter', sans-serif;
+}
 .fc-theme-standard td, .fc-theme-standard th {
   border-color: rgba(0,0,0,0.04) !important;
 }
 .fc-toolbar-title {
-  font-size: 1.2rem !important;
-  font-weight: 600 !important;
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+  color: var(--primary-color) !important;
 }
 .fc-button-primary {
-  background-color: #fff !important;
+  background-color: var(--card-bg) !important;
   border-color: rgba(0,0,0,0.08) !important;
   color: var(--text-dark) !important;
   border-radius: 8px !important;
   box-shadow: none !important;
+  text-transform: capitalize;
+  font-weight: 500 !important;
+  padding: 0.4rem 1rem !important;
+  transition: var(--transition);
 }
 .fc-button-primary:hover, .fc-button-primary:not(:disabled).fc-button-active {
-  background-color: rgba(108, 99, 255, 0.05) !important;
+  background-color: rgba(108, 99, 255, 0.08) !important;
   color: var(--accent-color) !important;
-  border-color: var(--accent-color) !important;
+  border-color: rgba(108, 99, 255, 0.2) !important;
 }
 .fc-event {
-  border-radius: 4px;
+  border-radius: 20px;
   border: none !important;
-  padding: 2px 4px;
-  font-size: 0.8rem;
+  padding: 3px 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  margin-top: 2px;
+}
+.fc-event:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(108, 99, 255, 0.3);
 }
 .fc .fc-daygrid-day.fc-day-today {
-  background-color: rgba(108, 99, 255, 0.02);
+  background-color: rgba(108, 99, 255, 0.04);
+}
+.fc-daygrid-day-number {
+  color: var(--text-dark);
+  font-weight: 500;
+  padding: 8px !important;
+}
+
+/* --- Dark Theme Rules --- */
+body.dark-theme {
+  --primary-color: #F8FAFC;
+  --secondary-color: #94A3B8;
+  --accent-color: #818CF8;
+  --text-dark: #F8FAFC;
+  --text-muted: #94A3B8;
+  --bg-color: #0F172A;
+  --card-bg: #1E293B;
+  --border-color: rgba(255, 255, 255, 0.05);
+  --nav-active-bg: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .text-muted {
+  color: #94A3B8 !important;
+}
+
+body.dark-theme .active-nav {
+  color: var(--accent-color) !important;
+}
+
+body.dark-theme .sidebar-panel {
+  background-color: var(--card-bg) !important;
+  border-right-color: var(--border-color) !important;
+}
+
+body.dark-theme .card {
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-theme .card-header {
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+body.dark-theme .btn-light {
+  background-color: rgba(255,255,255,0.05);
+  border-color: transparent;
+  color: var(--text-dark);
+}
+
+body.dark-theme .btn-light:hover {
+  background-color: rgba(255,255,255,0.1);
+}
+
+body.dark-theme .btn-light .text-muted,
+body.dark-theme button .text-muted {
+  color: #F8FAFC !important;
+}
+
+body.dark-theme .form-control, 
+body.dark-theme .form-select {
+  background-color: #0F172A;
+  color: #F8FAFC;
+  border-color: rgba(255,255,255,0.1);
+}
+
+body.dark-theme .form-control:focus, 
+body.dark-theme .form-select:focus {
+  background-color: #0F172A;
+  color: #F8FAFC;
+}
+
+body.dark-theme header.bg-white {
+  background-color: #1E293B !important;
+  border-bottom-color: rgba(255,255,255,0.05) !important;
+}
+
+/* FullCalendar Dark Overrides */
+body.dark-theme .fc-theme-standard td, 
+body.dark-theme .fc-theme-standard th {
+  border-color: rgba(255,255,255,0.05) !important;
+}
+
+body.dark-theme .fc-button-primary {
+  border-color: rgba(255,255,255,0.1) !important;
+}
+
+body.dark-theme .fc .fc-daygrid-day.fc-day-today {
+  background-color: rgba(129, 140, 248, 0.1);
+}
+
+body.dark-theme .modal-content {
+  background-color: var(--bg-color);
+  color: var(--text-dark);
+}
+
+body.dark-theme .modal-header,
+body.dark-theme .modal-footer {
+  background-color: var(--card-bg) !important;
+  border-color: rgba(255,255,255,0.05) !important;
 }
