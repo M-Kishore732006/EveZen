@@ -128,10 +128,10 @@ const Dashboard = () => {
 
             <Row className="mb-4">
                 {[
-                    { label: 'Events Today', value: stats.eventsToday, trend: '+2 than yesterday', icon: CalendarIcon, color: 'glass-icon-primary' },
-                    { label: 'Upcoming Events', value: stats.upcomingEvents, trend: 'Next 7 days', icon: Clock, color: 'glass-icon-warning' },
-                    { label: 'Active Faculty', value: stats.totalFaculty, trend: '+5% this month', icon: Users, color: 'glass-icon-success' },
-                    { label: 'Support Staff', value: stats.totalStaff, trend: 'Stable workforce', icon: NotebookText, color: 'glass-icon-primary' }
+                    { label: 'Events Today', value: stats.eventsToday, icon: CalendarIcon, color: 'glass-icon-primary' },
+                    { label: 'Upcoming Events', value: stats.upcomingEvents, icon: Clock, color: 'glass-icon-warning' },
+                    { label: 'Active Faculty', value: stats.totalFaculty, icon: Users, color: 'glass-icon-success' },
+                    { label: 'Support Staff', value: stats.totalStaff, icon: NotebookText, color: 'glass-icon-primary' }
                 ].map((stat, idx) => (
                     <Col lg={3} sm={6} key={idx} className="mb-3">
                         <motion.div variants={itemVariants}>
@@ -140,10 +140,6 @@ const Dashboard = () => {
                                     <div className={`glass-icon ${stat.color}`}>
                                         <stat.icon size={24} />
                                     </div>
-                                    <span style={{ fontSize: '0.85rem' }} className={stat.trend.includes('+') ? 'text-trend-up' : 'text-muted'}>
-                                        {stat.trend.includes('+') && <TrendingUp size={14} className="me-1" />}
-                                        {stat.trend}
-                                    </span>
                                 </div>
                                 <h3 style={{ fontWeight: 700, color: 'var(--primary-color)' }} className="mb-1">{stat.value}</h3>
                                 <p className="text-muted mb-0 fw-medium" style={{ fontSize: '0.9rem' }}>{stat.label}</p>

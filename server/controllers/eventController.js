@@ -23,7 +23,11 @@ const checkConflicts = async (date, startTime, endTime, venueId, facultyIds, sta
 
 const getEvents = async (req, res) => {
     try {
-        const events = await Event.find().populate('venue', 'name location').populate('assignedFaculty', 'name').populate('assignedStaff', 'name workType');
+        const events = await Event.find()
+            .populate('venue', 'name location')
+            .populate('assignedFaculty', 'name')
+            .populate('assignedStaff', 'name workType')
+            .populate('registeredStudents', 'name email');
         res.json(events);
     } catch (error) { res.status(500).json({ message: error.message }); }
 };
@@ -80,4 +84,27 @@ const getDashboardStats = async (req, res) => {
     } catch (error) { res.status(500).json({ message: error.message }); }
 };
 
-module.exports = { getEvents, createEvent, updateEvent, deleteEvent, getDashboardStats };
+const registerForEvent = async (req, res) => {
+    try {
+        const eventId = req.params.id;
+        const studentId = req.user.id;
+
+        const event = await Event.findById(eventId);
+        if (!event) return res.status(404).json({ message: 'Event not found' });
+
+        if (event.registeredStudents.includes(studentId)) {
+            return res.status(400).json({ message: 'You are already registered for this event.' });
+        }
+
+        if (event.registeredStudents.length >= event.capacity) {
+            return res.status(400).json({ message: 'Registration full. Capacity reached.' });
+        }
+
+        event.registeredStudents.push(studentId);
+        await event.save();
+
+        res.json({ message: 'Successfully registered for event.', event });
+    } catch (error) { res.status(500).json({ message: error.message }); }
+};
+
+module.exports = { getEvents, createEvent, updateEvent, deleteEvent, getDashboardStats, registerForEvent };

@@ -1,16 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Card, Button, Form, InputGroup, Badge } from 'react-bootstrap';
-import { Search, Send, FileText, Pin, MessageSquare } from 'lucide-react';
+import { pin, FileText, Pin, MessageSquare, Send } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { AuthContext } from '../../context/AuthContext';
+import axios from 'axios';
 
 const StudentForums = () => {
-    // Shared structure for both Student and Employee forums as requested. 
-    // We mock data as there is no backend model for forums.
-    const [activeEvent, setActiveEvent] = useState('Annual Tech Symposium 2026');
+    const { user } = useContext(AuthContext);
+    const [events, setEvents] = useState([]);
+    const [activeEvent, setActiveEvent] = useState(null);
     const [activeTab, setActiveTab] = useState('Announcements');
     const [newMessage, setNewMessage] = useState('');
 
-    const events = ['Annual Tech Symposium 2026', 'AI & Data Science Workshop'];
+    useEffect(() => {
+        if (user?.token) fetchEvents();
+    }, [user]);
+
+    const fetchEvents = async () => {
+        try {
+            const res = await axios.get('http://localhost:5000/api/events', { headers: { Authorization: `Bearer ${user.token}` } });
+            const filtered = res.data.filter(ev => ev.registeredStudents?.some(s => s._id === user._id));
+            setEvents(filtered);
+            if (filtered.length > 0) setActiveEvent(filtered[0]);
+        } catch (error) { console.error(error); }
+    };
 
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="h-100 d-flex flex-column">
@@ -27,19 +40,19 @@ const StudentForums = () => {
                     <h6 className="text-muted small fw-bold text-uppercase mb-1">Registered Events</h6>
                     {events.map((ev, idx) => (
                         <div 
-                            key={idx} 
+                            key={ev._id} 
                             onClick={() => setActiveEvent(ev)}
                             className="p-3 rounded-4 shadow-sm fw-medium d-flex align-items-center gap-3" 
                             style={{ 
                                 cursor: 'pointer', 
-                                backgroundColor: activeEvent === ev ? '#fff' : 'transparent',
-                                border: activeEvent === ev ? '1px solid rgba(108, 99, 255, 0.2)' : '1px solid transparent',
-                                color: activeEvent === ev ? 'var(--primary-color)' : 'var(--text-muted)',
+                                backgroundColor: activeEvent?._id === ev._id ? '#fff' : 'transparent',
+                                border: activeEvent?._id === ev._id ? '1px solid rgba(108, 99, 255, 0.2)' : '1px solid transparent',
+                                color: activeEvent?._id === ev._id ? 'var(--primary-color)' : 'var(--text-muted)',
                                 transition: 'all 0.2s'
                             }}
                         >
-                            <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: activeEvent === ev ? 'var(--accent-color)' : 'transparent' }}></div>
-                            <span className="text-truncate">{ev}</span>
+                            <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: activeEvent?._id === ev._id ? 'var(--accent-color)' : 'transparent' }}></div>
+                            <span className="text-truncate">{ev.title}</span>
                         </div>
                     ))}
                 </div>
@@ -47,7 +60,7 @@ const StudentForums = () => {
                 {/* Main Forum Area */}
                 <Card className="flex-grow-1 border-0 shadow-sm d-flex flex-column overflow-hidden">
                     <div className="p-4 border-bottom bg-light bg-opacity-50">
-                        <h5 className="fw-bold mb-3 text-dark">{activeEvent} Forum</h5>
+                        <h5 className="fw-bold mb-3 text-dark">{activeEvent ? activeEvent.title : 'Select an Event'} Forum</h5>
                         <div className="d-flex p-1" style={{ backgroundColor: 'rgba(0,0,0,0.03)', borderRadius: '12px', width: 'fit-content' }}>
                             {['Announcements', 'Questions', 'Resources'].map(tab => (
                                 <button 

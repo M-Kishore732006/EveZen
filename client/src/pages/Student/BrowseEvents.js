@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import axios from 'axios';
 import { Card, Button, Row, Col, Badge } from 'react-bootstrap';
-import { Calendar, MapPin, Users, Clock, Search, ArrowRight } from 'lucide-react';
+import { Calendar, MapPin, Users, Clock, Search, ArrowRight, CheckCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
@@ -21,6 +21,16 @@ const BrowseEvents = () => {
             const res = await axios.get('http://localhost:5000/api/events', { headers: { Authorization: `Bearer ${user.token}` } });
             setEvents(res.data);
         } catch (error) { console.error(error); }
+    };
+
+    const handleRegister = async (eventId) => {
+        try {
+            const res = await axios.post(`http://localhost:5000/api/events/${eventId}/register`, {}, { headers: { Authorization: `Bearer ${user.token}` } });
+            alert('Successfully registered!');
+            fetchEvents(); // Refresh to get updated lists
+        } catch (error) {
+            alert(error.response?.data?.message || 'Failed to register');
+        }
     };
 
     const containerVariants = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.1 } } };
@@ -73,9 +83,15 @@ const BrowseEvents = () => {
                                                 <Button variant="outline-primary" className="w-100 rounded-pill" onClick={() => navigate(`/student/events/${ev._id}`)}>
                                                     View Details
                                                 </Button>
-                                                <Button variant="primary" className="w-100 rounded-pill d-flex align-items-center justify-content-center" onClick={() => navigate(`/student/events/${ev._id}?tab=register`)}>
-                                                    Register <ArrowRight size={16} className="ms-1"/>
-                                                </Button>
+                                                {ev.registeredStudents?.some(s => s._id === user._id) ? (
+                                                    <Button variant="success" className="w-100 rounded-pill d-flex align-items-center justify-content-center" disabled>
+                                                        Registered <CheckCircle size={16} className="ms-1"/>
+                                                    </Button>
+                                                ) : (
+                                                    <Button variant="primary" className="w-100 rounded-pill d-flex align-items-center justify-content-center" onClick={() => handleRegister(ev._id)}>
+                                                        Register <ArrowRight size={16} className="ms-1"/>
+                                                    </Button>
+                                                )}
                                             </div>
                                         </div>
                                     </Card>

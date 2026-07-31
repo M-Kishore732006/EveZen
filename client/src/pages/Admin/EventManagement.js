@@ -15,7 +15,7 @@ const EventManagement = () => {
     
     const [showModal, setShowModal] = useState(false);
     const [formData, setFormData] = useState({
-        id: null, title: '', description: '', participationType: 'Individual', teamSize: 1,
+        id: null, title: '', description: '', participationType: 'Individual', teamSize: 1, capacity: 50,
         date: '', startTime: '', endTime: '', venue: '', assignedFaculty: [], assignedStaff: []
     });
     const [error, setError] = useState('');
@@ -77,7 +77,7 @@ const EventManagement = () => {
 
     const openCreate = () => {
         setFormData({
-            id: null, title: '', description: '', participationType: 'Individual', teamSize: 1,
+            id: null, title: '', description: '', participationType: 'Individual', teamSize: 1, capacity: 50,
             date: '', startTime: '', endTime: '', venue: '', assignedFaculty: [], assignedStaff: []
         });
         setShowModal(true);
@@ -85,7 +85,7 @@ const EventManagement = () => {
 
     const handleEdit = (ev) => {
         setFormData({
-            id: ev._id, title: ev.title, description: ev.description, participationType: ev.participationType, teamSize: ev.teamSize,
+            id: ev._id, title: ev.title, description: ev.description, participationType: ev.participationType, teamSize: ev.teamSize, capacity: ev.capacity || 50,
             date: ev.date.split('T')[0], startTime: ev.startTime, endTime: ev.endTime, venue: ev.venue?._id || '',
             assignedFaculty: ev.assignedFaculty.map(f => f._id), assignedStaff: ev.assignedStaff.map(s => s._id)
         });
@@ -197,12 +197,16 @@ const EventManagement = () => {
                                     <option value="Team">Team</option>
                                 </Form.Select>
                             </div>
-                            {formData.participationType === 'Team' ? (
-                                <div className="col-md-6 mb-2">
-                                    <Form.Label className="fw-medium text-muted small text-uppercase">Maximum Team Size</Form.Label>
+                            {formData.participationType === 'Team' && (
+                                <div className="col-md-3 mb-2">
+                                    <Form.Label className="fw-medium text-muted small text-uppercase">Team Size</Form.Label>
                                     <Form.Control type="number" min="2" value={formData.teamSize} onChange={e => setFormData({...formData, teamSize: e.target.value})} />
                                 </div>
-                            ) : <div className="col-md-6 mb-2"></div>}
+                            )}
+                            <div className={formData.participationType === 'Team' ? "col-md-3 mb-2" : "col-md-6 mb-2"}>
+                                <Form.Label className="fw-medium text-muted small text-uppercase">Total Capacity</Form.Label>
+                                <Form.Control required type="number" min="1" placeholder="e.g. 50" value={formData.capacity} onChange={e => setFormData({...formData, capacity: e.target.value})} />
+                            </div>
                             <div className="col-md-12 mb-3">
                                 <Form.Label className="fw-medium text-muted small text-uppercase">Description (Optional)</Form.Label>
                                 <Form.Control as="textarea" rows={2} placeholder="Provide a brief overview..." value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />

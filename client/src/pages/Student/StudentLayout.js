@@ -57,7 +57,6 @@ const StudentLayout = () => {
         { path: '/student', icon: LayoutDashboard, label: 'Dashboard', end: true },
         { path: '/student/browse', icon: Compass, label: 'Browse Events' },
         { path: '/student/registrations', icon: Ticket, label: 'My Registrations' },
-        { path: '/student/qr', icon: QrCode, label: 'My QR' },
         { path: '/student/forums', icon: MessageSquare, label: 'Discussion Forums' },
         { path: '/student/profile', icon: User, label: 'Profile' }
     ];

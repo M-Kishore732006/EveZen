@@ -1,18 +1,37 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { Card, Button, Form, InputGroup, Badge } from 'react-bootstrap';
 import { Search, Send, FileText, Pin, MessageSquare, Plus, Paperclip } from 'lucide-react';
 import { motion } from 'framer-motion';
+import axios from 'axios';
 
 const EmployeeForums = () => {
     const { user } = useContext(AuthContext);
     const isFaculty = user?.role === 'Faculty';
+    const isStaff = user?.role === 'Supporting Staff';
 
-    const [activeEvent, setActiveEvent] = useState('Annual Tech Symposium 2026');
+    const [events, setEvents] = useState([]);
+    const [activeEvent, setActiveEvent] = useState(null);
     const [activeTab, setActiveTab] = useState('Announcements');
     const [newMessage, setNewMessage] = useState('');
 
-    const events = ['Annual Tech Symposium 2026', 'AI & Data Science Workshop'];
+    useEffect(() => {
+        if (user?.token) fetchEvents();
+    }, [user]);
+
+    const fetchEvents = async () => {
+        try {
+            const res = await axios.get('http://localhost:5000/api/events', { headers: { Authorization: `Bearer ${user.token}` } });
+            
+            const filtered = res.data.filter(ev => {
+                if (isStaff) return ev.assignedStaff?.some(s => s._id === user._id);
+                return ev.assignedFaculty?.some(f => f._id === user._id);
+            });
+            
+            setEvents(filtered);
+            if (filtered.length > 0) setActiveEvent(filtered[0]);
+        } catch (error) { console.error(error); }
+    };
 
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="h-100 d-flex flex-column">
@@ -26,17 +45,17 @@ const EmployeeForums = () => {
             <div className="d-flex h-100 gap-4" style={{ minHeight: '600px' }}>
                 <div style={{ width: '280px' }} className="d-flex flex-column gap-3">
                     <h6 className="text-muted small fw-bold text-uppercase mb-1">Assigned Events</h6>
-                    {events.map((ev, idx) => (
-                        <div key={idx} onClick={() => setActiveEvent(ev)} className="p-3 rounded-4 shadow-sm fw-medium d-flex align-items-center gap-3" style={{ cursor: 'pointer', backgroundColor: activeEvent === ev ? '#fff' : 'transparent', border: activeEvent === ev ? '1px solid rgba(108, 99, 255, 0.2)' : '1px solid transparent', color: activeEvent === ev ? 'var(--primary-color)' : 'var(--text-muted)', transition: 'all 0.2s' }}>
-                            <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: activeEvent === ev ? 'var(--accent-color)' : 'transparent' }}></div>
-                            <span className="text-truncate">{ev}</span>
+                    {events.map((ev) => (
+                        <div key={ev._id} onClick={() => setActiveEvent(ev)} className="p-3 rounded-4 shadow-sm fw-medium d-flex align-items-center gap-3" style={{ cursor: 'pointer', backgroundColor: activeEvent?._id === ev._id ? '#fff' : 'transparent', border: activeEvent?._id === ev._id ? '1px solid rgba(108, 99, 255, 0.2)' : '1px solid transparent', color: activeEvent?._id === ev._id ? 'var(--primary-color)' : 'var(--text-muted)', transition: 'all 0.2s' }}>
+                            <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: activeEvent?._id === ev._id ? 'var(--accent-color)' : 'transparent' }}></div>
+                            <span className="text-truncate">{ev.title}</span>
                         </div>
                     ))}
                 </div>
 
                 <Card className="flex-grow-1 border-0 shadow-sm d-flex flex-column overflow-hidden">
                     <div className="p-4 border-bottom bg-light bg-opacity-50 d-flex justify-content-between align-items-center flex-wrap gap-3">
-                        <h5 className="fw-bold mb-0 text-dark">{activeEvent} Forum</h5>
+                        <h5 className="fw-bold mb-0 text-dark">{activeEvent ? activeEvent.title : 'Select an Event'} Forum</h5>
                         {isFaculty && (
                             <Button variant="primary" size="sm" className="rounded-pill d-flex align-items-center px-4 shadow-sm">
                                 <Plus size={16} className="me-2"/> Create Post

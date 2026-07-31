@@ -1,33 +1,80 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useRef } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { Card, Row, Col, Button } from 'react-bootstrap';
-import { Ticket, Calendar, CheckCircle, Bell, ArrowRight, QrCode, MessageSquare } from 'lucide-react';
+import { Ticket, Calendar, CheckCircle, Bell, ArrowRight, ChevronLeft, ChevronRight, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 
+// FullCalendar Imports
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import interactionPlugin from '@fullcalendar/interaction';
+
 const Dashboard = () => {
     const { user } = useContext(AuthContext);
     const navigate = useNavigate();
-    const [stats, setStats] = useState({ registered: 3, upcoming: 1, completed: 5, pendingForums: 2 });
+    const calendarRef = useRef(null);
+    const [currentDateTitle, setCurrentDateTitle] = useState('');
+    const [currentView, setCurrentView] = useState('dayGridMonth');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [stats, setStats] = useState({ registered: 0, upcoming: 0, completed: 0, pendingForums: 0 });
+    const [events, setEvents] = useState([]);
     
     // We fetch real events but for 'registered' stats we would ideally have a backend endpoint. 
-    // We mock the count slightly based on what exists for visualization.
-    const [recentEvents, setRecentEvents] = useState([]);
-
-    useEffect(() => {
-        if (user?.token) fetchRecentEvents();
-    }, [user]);
-
+    // For demo purposes, we treat all available events as actionable by the student.
     const fetchRecentEvents = async () => {
         try {
             const res = await axios.get('http://localhost:5000/api/events', { headers: { Authorization: `Bearer ${user.token}` } });
-            setRecentEvents(res.data.slice(0, 3)); // Mocking recent recommendations
+            const allEvents = res.data;
+            setEvents(allEvents);
+
+            // Calculate dynamic stats!
+            const now = new Date();
+            const upcoming = allEvents.filter(ev => new Date(ev.date) >= now).length;
+            const completed = allEvents.filter(ev => new Date(ev.date) < now).length;
+            
+            // "registered" would ideally check attendees list; defaulting to upcoming for student
+            setStats({
+                registered: upcoming > 0 ? upcoming - 1 : 0, 
+                upcoming: upcoming,
+                completed: completed,
+                pendingForums: 0
+            });
+
         } catch (error) { console.error(error); }
     };
 
     const containerVariants = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.1 } } };
     const itemVariants = { hidden: { opacity: 0, y: 15 }, show: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
+
+    const calendarEvents = events.map(ev => {
+        const startDateTime = new Date(`${ev.date.split('T')[0]}T${ev.startTime}`);
+        const endDateTime = new Date(`${ev.date.split('T')[0]}T${ev.endTime}`);
+        return { id: ev._id, title: ev.title, start: startDateTime, end: endDateTime, extendedProps: ev };
+    });
+
+    const filteredEvents = calendarEvents.filter(ev => ev.title.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    const handlePrev = () => { const api = calendarRef.current.getApi(); api.prev(); setCurrentDateTitle(api.view.title); };
+    const handleNext = () => { const api = calendarRef.current.getApi(); api.next(); setCurrentDateTitle(api.view.title); };
+    const handleToday = () => { const api = calendarRef.current.getApi(); api.today(); setCurrentDateTitle(api.view.title); };
+    const handleViewChange = (viewName) => { const api = calendarRef.current.getApi(); api.changeView(viewName); setCurrentView(viewName); setCurrentDateTitle(api.view.title); };
+    const handleDatesSet = (dateInfo) => { setCurrentDateTitle(dateInfo.view.title); };
+
+    const renderEventContent = (eventInfo) => {
+        const isPast = eventInfo.event.start < new Date();
+        const statusColor = isPast ? '#94A3B8' : (eventInfo.event.start <= new Date() && eventInfo.event.end >= new Date() ? 'var(--success-color, #10B981)' : 'var(--accent-color, #6C63FF)');
+        return (
+            <div className="custom-event-card" style={{ borderLeftColor: statusColor }}>
+                <div className="d-flex justify-content-between align-items-center mb-1">
+                    <div className="custom-event-title">{eventInfo.event.title}</div>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: statusColor }}></div>
+                </div>
+                <div className="custom-event-time">{eventInfo.timeText}</div>
+            </div>
+        );
+    };
 
     return (
         <motion.div variants={containerVariants} initial="hidden" animate="show" className="h-100">
@@ -48,24 +95,21 @@ const Dashboard = () => {
 
             <Row className="mb-4">
                 {[
-                    { label: 'Registered Events', value: stats.registered, icon: Ticket, color: 'text-primary', badge: 'bg-primary' },
-                    { label: 'Upcoming Events', value: stats.upcoming, icon: Calendar, color: 'text-warning', badge: 'bg-warning' },
-                    { label: 'Completed Events', value: stats.completed, icon: CheckCircle, color: 'text-success', badge: 'bg-success' },
-                    { label: 'Forum Notifications', value: stats.pendingForums, icon: Bell, color: 'text-danger', badge: 'bg-danger' }
+                    { label: 'Registered Events', value: stats.registered, icon: Ticket, color: 'glass-icon-primary' },
+                    { label: 'Upcoming Events', value: stats.upcoming, icon: Calendar, color: 'glass-icon-warning' },
+                    { label: 'Completed Events', value: stats.completed, icon: CheckCircle, color: 'glass-icon-success' },
+                    { label: 'Forum Updates', value: stats.pendingForums, icon: Bell, color: 'glass-icon-danger' }
                 ].map((stat, idx) => (
                     <Col lg={3} sm={6} key={idx} className="mb-3">
                         <motion.div variants={itemVariants}>
-                            <Card className="p-4 border-0 shadow-sm h-100 position-relative overflow-hidden">
-                                <div className={`position-absolute top-0 end-0 p-3 opacity-10 ${stat.color}`}>
-                                    <stat.icon size={60} style={{ transform: 'translate(10%, -10%)' }} />
-                                </div>
-                                <div className="d-flex align-items-center gap-3 mb-3">
-                                    <div className={`p-2 rounded ${stat.badge} bg-opacity-10 ${stat.color}`}>
+                            <Card className="p-4 h-100 border-0 shadow-sm">
+                                <div className="d-flex justify-content-between align-items-start mb-3">
+                                    <div className={`glass-icon ${stat.color}`}>
                                         <stat.icon size={24} />
                                     </div>
-                                    <span className="text-muted fw-bold text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>{stat.label}</span>
                                 </div>
-                                <h2 className="fw-bold mb-0" style={{ fontSize: '2.5rem' }}>{stat.value}</h2>
+                                <h3 style={{ fontWeight: 700, color: 'var(--primary-color)' }} className="mb-1">{stat.value}</h3>
+                                <p className="text-muted mb-0 fw-medium" style={{ fontSize: '0.9rem' }}>{stat.label}</p>
                             </Card>
                         </motion.div>
                     </Col>
@@ -73,44 +117,51 @@ const Dashboard = () => {
             </Row>
 
             <Row>
-                <Col lg={8}>
-                    <motion.div variants={itemVariants}>
-                        <Card className="border-0 shadow-sm p-4">
-                            <div className="d-flex justify-content-between align-items-center mb-4">
-                                <h5 className="fw-bold mb-0">Recommended for You</h5>
-                                <Button variant="link" className="text-decoration-none text-muted" onClick={() => navigate('/student/browse')}>View All</Button>
+                <Col lg={12} className="mb-4">
+                    <motion.div variants={itemVariants} className="h-100">
+                        <Card className="p-0 border-0 shadow-sm h-100" style={{ borderRadius: '20px', overflow: 'hidden' }}>
+                            <div className="p-4 border-bottom d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 bg-white" style={{ backgroundColor: 'var(--card-bg)' }}>
+                                <div className="d-flex align-items-center gap-3">
+                                    <div className="d-flex bg-light rounded-pill p-1">
+                                        <button className="btn btn-sm border-0 rounded-circle d-flex align-items-center justify-content-center p-2 calendar-nav-btn" onClick={handlePrev}><ChevronLeft size={18} /></button>
+                                        <button className="btn btn-sm border-0 rounded-circle d-flex align-items-center justify-content-center p-2 calendar-nav-btn" onClick={handleNext}><ChevronRight size={18} /></button>
+                                    </div>
+                                    <h4 className="mb-0 fw-bold d-flex align-items-center gap-2" style={{ color: 'var(--primary-color)' }}>
+                                        📅 {currentDateTitle || 'Calendar'}
+                                    </h4>
+                                </div>
+                                <div className="d-flex align-items-center gap-3 flex-wrap">
+                                    <div className="position-relative">
+                                        <Search size={16} className="position-absolute text-muted" style={{ left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+                                        <input 
+                                            type="text" 
+                                            className="form-control form-control-sm rounded-pill" 
+                                            placeholder="Search events..." 
+                                            style={{ paddingLeft: '36px', width: '200px', backgroundColor: 'var(--bg-color)', border: 'none' }}
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                        />
+                                    </div>
+                                    <button className="btn btn-sm btn-light rounded-pill px-3 fw-medium" onClick={handleToday}>Today</button>
+                                    <div className="d-flex bg-light rounded-pill p-1">
+                                        <button className={`btn btn-sm border-0 rounded-pill px-3 py-1 fw-medium ${currentView === 'dayGridMonth' ? 'btn-white shadow-sm text-primary' : 'text-muted'}`} onClick={() => handleViewChange('dayGridMonth')}>Month</button>
+                                        <button className={`btn btn-sm border-0 rounded-pill px-3 py-1 fw-medium ${currentView === 'dayGridWeek' ? 'btn-white shadow-sm text-primary' : 'text-muted'}`} onClick={() => handleViewChange('dayGridWeek')}>Week</button>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="d-flex gap-3 overflow-auto pb-2" style={{ scrollbarWidth: 'none' }}>
-                                {recentEvents.map(ev => (
-                                    <Card key={ev._id} className="border shadow-none" style={{ minWidth: '280px', borderRadius: '12px' }}>
-                                        <div style={{ height: '120px', backgroundColor: 'rgba(108, 99, 255, 0.1)' }} className="d-flex align-items-center justify-content-center">
-                                            <Calendar size={40} className="text-muted opacity-50" />
-                                        </div>
-                                        <div className="p-3">
-                                            <h6 className="fw-bold mb-1 text-truncate">{ev.title}</h6>
-                                            <p className="text-muted small mb-3">{new Date(ev.date).toLocaleDateString()}</p>
-                                            <Button variant="outline-primary" size="sm" className="w-100" onClick={() => navigate(`/student/events/${ev._id}`)}>View Details</Button>
-                                        </div>
-                                    </Card>
-                                ))}
-                                {recentEvents.length === 0 && <p className="text-muted">No recommendations available.</p>}
-                            </div>
-                        </Card>
-                    </motion.div>
-                </Col>
-                <Col lg={4}>
-                    <motion.div variants={itemVariants}>
-                        <Card className="border-0 shadow-sm p-4 h-100">
-                            <h5 className="fw-bold mb-4">Quick Access</h5>
-                            <div className="d-grid gap-3">
-                                <Button variant="light" className="text-start p-3 d-flex align-items-center gap-3 border shadow-none" onClick={() => navigate('/student/qr')}>
-                                    <div className="bg-primary bg-opacity-10 p-2 rounded text-primary"><QrCode size={20}/></div>
-                                    <span className="fw-medium">Scan Event QR</span>
-                                </Button>
-                                <Button variant="light" className="text-start p-3 d-flex align-items-center gap-3 border shadow-none" onClick={() => navigate('/student/forums')}>
-                                    <div className="bg-warning bg-opacity-10 p-2 rounded text-warning"><MessageSquare size={20}/></div>
-                                    <span className="fw-medium">Join Discussions</span>
-                                </Button>
+                            <div className="p-4" style={{ height: '600px', backgroundColor: 'var(--card-bg)' }}>
+                                <FullCalendar
+                                    ref={calendarRef}
+                                    plugins={[dayGridPlugin, interactionPlugin]}
+                                    initialView="dayGridMonth"
+                                    events={filteredEvents}
+                                    eventClick={(info) => navigate(`/student/events/${info.event.id}`)}
+                                    datesSet={handleDatesSet}
+                                    headerToolbar={false}
+                                    height="100%"
+                                    eventTimeFormat={{ hour: 'numeric', minute: '2-digit', meridiem: 'short' }}
+                                    eventContent={renderEventContent}
+                                />
                             </div>
                         </Card>
                     </motion.div>

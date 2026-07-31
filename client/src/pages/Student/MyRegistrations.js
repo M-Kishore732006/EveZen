@@ -1,17 +1,62 @@
-import React from 'react';
-import { Card, Button, Row, Col, Badge } from 'react-bootstrap';
-import { QrCode, Calendar, MapPin, Eye, Ticket } from 'lucide-react';
+import React, { useState, useEffect, useContext } from 'react';
+import { Card, Button, Row, Col, Badge, Modal } from 'react-bootstrap';
+import { QrCode, Calendar, MapPin, Eye, Ticket, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../context/AuthContext';
+import axios from 'axios';
+import { QRCodeSVG } from 'qrcode.react';
 
 const MyRegistrations = () => {
     const navigate = useNavigate();
-    
-    // We mock registrations since there's no backend endpoint, as instructed.
-    const registrations = [
-        { id: '1', title: 'Annual Tech Symposium 2026', team: 'Cyber Ninjas', date: '2026-08-15', status: 'Confirmed', participation: 'Team' },
-        { id: '2', title: 'AI & Data Science Workshop', team: 'Individual', date: '2026-09-02', status: 'Pending Approval', participation: 'Individual' },
-    ];
+    const { user } = useContext(AuthContext);
+    const [registrations, setRegistrations] = useState([]);
+    const [showQR, setShowQR] = useState(false);
+    const [selectedEventId, setSelectedEventId] = useState(null);
+    const [qrCodeData, setQrCodeData] = useState('');
+    const [timeLeft, setTimeLeft] = useState(60);
+
+    useEffect(() => {
+        if (user?.token) fetchRegistrations();
+    }, [user]);
+
+    const fetchRegistrations = async () => {
+        try {
+            const res = await axios.get('http://localhost:5000/api/events', { headers: { Authorization: `Bearer ${user.token}` } });
+            const filtered = res.data.filter(ev => ev.registeredStudents?.some(s => s._id === user._id));
+            setRegistrations(filtered);
+        } catch (error) { console.error(error); }
+    };
+
+    // Dynamic QR generation
+    useEffect(() => {
+        let timer;
+        let qrInterval;
+        if (showQR && selectedEventId) {
+            const generateQR = () => {
+                const timestamp = new Date().getTime();
+                setQrCodeData(`EVENT:${selectedEventId}|USER:${user._id}|TS:${timestamp}`);
+                setTimeLeft(60);
+            };
+            
+            generateQR(); // Initial gen
+            
+            timer = setInterval(() => {
+                setTimeLeft(prev => {
+                    if (prev <= 1) return 60;
+                    return prev - 1;
+                });
+            }, 1000);
+
+            qrInterval = setInterval(generateQR, 60000);
+        }
+        return () => { clearInterval(timer); clearInterval(qrInterval); };
+    }, [showQR, selectedEventId, user]);
+
+    const openQR = (eventId) => {
+        setSelectedEventId(eventId);
+        setShowQR(true);
+    };
 
     const containerVariants = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.1 } } };
     const itemVariants = { hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } };
@@ -28,7 +73,7 @@ const MyRegistrations = () => {
             <motion.div variants={containerVariants} initial="hidden" animate="show">
                 <Row className="gy-4">
                     {registrations.map(reg => (
-                        <Col md={12} key={reg.id}>
+                        <Col md={12} key={reg._id}>
                             <motion.div variants={itemVariants}>
                                 <Card className="border-0 shadow-sm overflow-hidden d-flex flex-row" style={{ minHeight: '140px', transition: 'transform 0.2s' }} onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
                                     <div style={{ width: '120px', background: 'linear-gradient(45deg, rgba(50, 30, 72, 0.8), rgba(108, 99, 255, 0.8))' }} className="d-flex align-items-center justify-content-center flex-shrink-0 text-white">
@@ -38,20 +83,20 @@ const MyRegistrations = () => {
                                         <div>
                                             <div className="d-flex align-items-center gap-3 mb-1">
                                                 <h5 className="fw-bold mb-0 text-dark">{reg.title}</h5>
-                                                <Badge bg={reg.status === 'Confirmed' ? 'success' : 'warning'} text={reg.status === 'Confirmed' ? 'white' : 'dark'} className="border bg-opacity-75">{reg.status}</Badge>
+                                                <Badge bg="success" text="white" className="border bg-opacity-75">Confirmed</Badge>
                                             </div>
-                                            <p className="text-muted small fw-medium mb-2 opacity-75">Participation: {reg.participation} • Entity: {reg.team}</p>
+                                            <p className="text-muted small fw-medium mb-2 opacity-75">Participation: {reg.participationType}</p>
                                             <div className="d-flex align-items-center gap-3 text-muted" style={{ fontSize: '0.85rem' }}>
                                                 <span className="d-flex align-items-center gap-1"><Calendar size={14}/> {new Date(reg.date).toLocaleDateString()}</span>
-                                                <span className="d-flex align-items-center gap-1"><MapPin size={14}/> Main Campus</span>
+                                                <span className="d-flex align-items-center gap-1"><MapPin size={14}/> {reg.venue?.name || 'TBA'}</span>
                                             </div>
                                         </div>
                                         
                                         <div className="d-flex gap-2">
-                                            <Button variant="light" className="rounded-pill d-flex align-items-center px-4 border shadow-sm">
+                                            <Button variant="light" className="rounded-pill d-flex align-items-center px-4 border shadow-sm" onClick={() => navigate(`/student/events/${reg._id}`)}>
                                                 <Eye size={16} className="me-2 text-muted"/> View Details
                                             </Button>
-                                            <Button variant="primary" className="rounded-pill d-flex align-items-center px-4 shadow-sm" onClick={() => navigate('/student/qr')}>
+                                            <Button variant="primary" className="rounded-pill d-flex align-items-center px-4 shadow-sm" onClick={() => openQR(reg._id)}>
                                                 <QrCode size={16} className="me-2"/> Authentication QR
                                             </Button>
                                         </div>
@@ -69,6 +114,24 @@ const MyRegistrations = () => {
                     )}
                 </Row>
             </motion.div>
+
+            {/* Dynamic QR Modal */}
+            <Modal show={showQR} onHide={() => setShowQR(false)} centered>
+                <Modal.Header closeButton className="border-0 pb-0">
+                    <Modal.Title className="fw-bold text-center w-100" style={{ color: 'var(--primary-color)' }}>Event Access Pass</Modal.Title>
+                </Modal.Header>
+                <Modal.Body className="d-flex flex-column align-items-center pb-5 pt-3">
+                    <p className="text-muted text-center mb-4">Present this secure QR code at the registration desk. It refreshes automatically.</p>
+                    
+                    <div className="p-3 bg-white rounded-4 shadow-sm border mb-4" style={{ display: 'inline-block' }}>
+                        {qrCodeData && <QRCodeSVG value={qrCodeData} size={220} level="H" fgColor="var(--primary-color)" />}
+                    </div>
+
+                    <div className="d-flex align-items-center gap-2 text-primary fw-medium px-4 py-2 rounded-pill" style={{ backgroundColor: 'rgba(108, 99, 255, 0.1)' }}>
+                        <Clock size={16} /> Auto-refreshing in: <strong style={{ width: '24px', textAlign: 'center' }}>{timeLeft}s</strong>
+                    </div>
+                </Modal.Body>
+            </Modal>
         </motion.div>
     );
 };
