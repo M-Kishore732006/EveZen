@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import axios from 'axios';
-import { Card, Table, Button, Modal, Form, Alert, Badge } from 'react-bootstrap';
-import { Edit, Trash, Plus } from 'lucide-react';
+import { Card, Button, Modal, Form, Alert, Badge } from 'react-bootstrap';
+import { Edit, Trash, Plus, Calendar, Clock, MapPin, Users, Info } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const EventManagement = () => {
     const { user } = useContext(AuthContext);
@@ -65,7 +66,7 @@ const EventManagement = () => {
     };
 
     const handleDelete = async (id) => {
-        if (window.confirm('Delete this event?')) {
+        if (window.confirm('Are you sure you want to delete this event? This action cannot be undone.')) {
             try {
                 await axios.delete(`http://localhost:5000/api/events/${id}`, { headers: { Authorization: `Bearer ${user.token}` } });
                 fetchEvents();
@@ -90,109 +91,142 @@ const EventManagement = () => {
         setShowModal(true);
     };
 
+    const containerVariants = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.1 } } };
+    const itemVariants = { hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } };
+
     return (
-        <div>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="h-100 d-flex flex-column">
             <div className="d-flex justify-content-between align-items-center mb-4">
-                <h4 style={{ fontWeight: 600 }}>Event Management</h4>
-                <Button variant="primary" onClick={openCreate} className="d-flex align-items-center gap-2">
+                <div>
+                    <h3 style={{ fontWeight: 700, color: 'var(--primary-color)' }}>Event Board</h3>
+                    <p className="text-muted mb-0">Manage and schedule new institutional events.</p>
+                </div>
+                <Button variant="primary" onClick={openCreate} className="d-flex align-items-center gap-2 px-4 shadow-sm">
                     <Plus size={18} /> Schedule Event
                 </Button>
             </div>
             
-            <Card className="p-0 shadow-sm border-0">
-                <Table responsive hover className="mb-0">
-                    <thead style={{ backgroundColor: 'var(--bg-color)' }}>
-                        <tr>
-                            <th className="px-4 py-3">Event Name</th>
-                            <th>Type</th>
-                            <th>Date & Time</th>
-                            <th>Venue</th>
-                            <th className="text-end px-4">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {events.map(ev => (
-                            <tr key={ev._id}>
-                                <td className="px-4 py-3 fw-medium">{ev.title}</td>
-                                <td>{ev.participationType} {ev.participationType === 'Team' && <Badge bg="secondary">Sz: {ev.teamSize}</Badge>}</td>
-                                <td className="text-muted">{new Date(ev.date).toLocaleDateString()} <br/><small>{ev.startTime} - {ev.endTime}</small></td>
-                                <td className="text-muted">{ev.venue?.name || 'TBA'}</td>
-                                <td className="text-end px-4 pt-3">
-                                    <Button variant="light" size="sm" className="me-2" onClick={() => handleEdit(ev)}><Edit size={16} color="var(--secondary-color)" /></Button>
-                                    <Button variant="light" size="sm" onClick={() => handleDelete(ev._id)}><Trash size={16} color="#e3342f" /></Button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </Table>
+            <Card className="flex-grow-1 p-0 shadow-sm border-0 d-flex flex-column" style={{ overflow: 'hidden' }}>
+                <div className="bg-light px-4 py-3 d-grid align-items-center" style={{ gridTemplateColumns: '2fr 1fr 1.5fr 1fr 0.5fr', borderBottom: '1px solid rgba(0,0,0,0.05)', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                    <div>Event Details</div>
+                    <div>Type</div>
+                    <div>Schedule</div>
+                    <div>Location</div>
+                    <div className="text-end">Actions</div>
+                </div>
+                
+                <div className="flex-grow-1" style={{ overflowY: 'auto' }}>
+                    {events.length === 0 ? (
+                        <div className="d-flex flex-column align-items-center justify-content-center h-100 text-muted p-5">
+                            <Calendar size={48} className="mb-3" style={{ opacity: 0.2 }} />
+                            <h5>No events scheduled</h5>
+                            <p>Click the schedule button to create your first event.</p>
+                        </div>
+                    ) : (
+                        <motion.div variants={containerVariants} initial="hidden" animate="show">
+                            {events.map(ev => (
+                                <motion.div variants={itemVariants} key={ev._id} className="px-4 py-3 border-bottom d-grid align-items-center" style={{ gridTemplateColumns: '2fr 1fr 1.5fr 1fr 0.5fr', transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8f9fb'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+                                    <div>
+                                        <div className="fw-semibold text-dark" style={{ fontSize: '0.95rem' }}>{ev.title}</div>
+                                        {ev.description && <div className="text-muted text-truncate" style={{ fontSize: '0.8rem', maxWidth: '250px' }}>{ev.description}</div>}
+                                    </div>
+                                    <div>
+                                        <Badge bg={ev.participationType === 'Team' ? 'info' : 'secondary'} className="px-2 py-1 fw-medium" style={{ borderRadius: '6px' }}>
+                                            {ev.participationType} {ev.participationType === 'Team' && `(${ev.teamSize})`}
+                                        </Badge>
+                                    </div>
+                                    <div>
+                                        <div className="d-flex align-items-center gap-2 text-dark" style={{ fontSize: '0.9rem' }}>
+                                            <Calendar size={14} className="text-muted" /> {new Date(ev.date).toLocaleDateString()}
+                                        </div>
+                                        <div className="d-flex align-items-center gap-2 text-muted" style={{ fontSize: '0.8rem', marginTop: '2px' }}>
+                                            <Clock size={14} /> {ev.startTime} - {ev.endTime}
+                                        </div>
+                                    </div>
+                                    <div className="d-flex align-items-center gap-2 text-dark" style={{ fontSize: '0.9rem' }}>
+                                        <MapPin size={16} className="text-muted" /> <span className="text-truncate">{ev.venue?.name || 'TBA'}</span>
+                                    </div>
+                                    <div className="text-end d-flex justify-content-end gap-2">
+                                        <button className="btn btn-light btn-sm rounded-circle p-2 d-flex" onClick={() => handleEdit(ev)}><Edit size={16} className="text-primary" /></button>
+                                        <button className="btn btn-light btn-sm rounded-circle p-2 d-flex" onClick={() => handleDelete(ev._id)}><Trash size={16} className="text-danger" /></button>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </motion.div>
+                    )}
+                </div>
             </Card>
 
             <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" centered>
-                <Modal.Header closeButton className="border-0 pb-0">
-                    <Modal.Title>{formData.id ? 'Edit Event' : 'Schedule Event'}</Modal.Title>
+                <Modal.Header closeButton style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', padding: '1.5rem', backgroundColor: '#f8f9fb', borderRadius: '16px 16px 0 0' }}>
+                    <Modal.Title style={{ fontWeight: 700, color: 'var(--primary-color)' }}>{formData.id ? 'Edit Event Details' : 'Schedule New Event'}</Modal.Title>
                 </Modal.Header>
-                <Modal.Body className="pt-3">
-                    {error && <Alert variant="danger" className="mb-3 p-2">{error}</Alert>}
+                <Modal.Body className="p-4">
+                    {error && <div className="p-3 mb-4 rounded d-flex align-items-center gap-3" style={{ backgroundColor: 'rgba(231, 76, 60, 0.1)', color: '#e74c3c' }}><Info size={20}/> <span className="fw-medium">{error}</span></div>}
                     <Form onSubmit={handleSave}>
-                        <div className="row">
-                            <div className="col-md-6 mb-3">
-                                <Form.Label>Event Title</Form.Label>
-                                <Form.Control required type="text" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} />
+                        <div className="row gy-3">
+                            <div className="col-md-6 mb-2">
+                                <Form.Label className="fw-medium text-muted small text-uppercase">Event Title</Form.Label>
+                                <Form.Control required type="text" placeholder="e.g. Annual Tech Symposium" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} />
                             </div>
-                            <div className="col-md-6 mb-3">
-                                <Form.Label>Venue</Form.Label>
+                            <div className="col-md-6 mb-2">
+                                <Form.Label className="fw-medium text-muted small text-uppercase">Venue</Form.Label>
                                 <Form.Select required value={formData.venue} onChange={e => setFormData({...formData, venue: e.target.value})}>
-                                    <option value="">Select Venue</option>
+                                    <option value="">Select a location</option>
                                     {venues.map(v => <option key={v._id} value={v._id}>{v.name}</option>)}
                                 </Form.Select>
                             </div>
-                            <div className="col-md-4 mb-3">
-                                <Form.Label>Date</Form.Label>
+                            <div className="col-md-4 mb-2">
+                                <Form.Label className="fw-medium text-muted small text-uppercase">Date</Form.Label>
                                 <Form.Control required type="date" value={formData.date} onChange={e => setFormData({...formData, date: e.target.value})} />
                             </div>
-                            <div className="col-md-4 mb-3">
-                                <Form.Label>Start Time</Form.Label>
+                            <div className="col-md-4 mb-2">
+                                <Form.Label className="fw-medium text-muted small text-uppercase">Start Time</Form.Label>
                                 <Form.Control required type="time" value={formData.startTime} onChange={e => setFormData({...formData, startTime: e.target.value})} />
                             </div>
-                            <div className="col-md-4 mb-3">
-                                <Form.Label>End Time</Form.Label>
+                            <div className="col-md-4 mb-2">
+                                <Form.Label className="fw-medium text-muted small text-uppercase">End Time</Form.Label>
                                 <Form.Control required type="time" value={formData.endTime} onChange={e => setFormData({...formData, endTime: e.target.value})} />
                             </div>
-                            <div className="col-md-6 mb-3">
-                                <Form.Label>Participation Type</Form.Label>
+                            {/* Same setup as before but with modern styles */}
+                            <div className="col-md-6 mb-2">
+                                <Form.Label className="fw-medium text-muted small text-uppercase">Participation Type</Form.Label>
                                 <Form.Select value={formData.participationType} onChange={e => setFormData({...formData, participationType: e.target.value})}>
                                     <option value="Individual">Individual</option>
                                     <option value="Team">Team</option>
                                 </Form.Select>
                             </div>
-                            {formData.participationType === 'Team' && (
-                                <div className="col-md-6 mb-3">
-                                    <Form.Label>Team Size</Form.Label>
+                            {formData.participationType === 'Team' ? (
+                                <div className="col-md-6 mb-2">
+                                    <Form.Label className="fw-medium text-muted small text-uppercase">Maximum Team Size</Form.Label>
                                     <Form.Control type="number" min="2" value={formData.teamSize} onChange={e => setFormData({...formData, teamSize: e.target.value})} />
                                 </div>
-                            )}
+                            ) : <div className="col-md-6 mb-2"></div>}
                             <div className="col-md-12 mb-3">
-                                <Form.Label>Description (Optional)</Form.Label>
-                                <Form.Control as="textarea" rows={2} value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
+                                <Form.Label className="fw-medium text-muted small text-uppercase">Description (Optional)</Form.Label>
+                                <Form.Control as="textarea" rows={2} placeholder="Provide a brief overview..." value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
                             </div>
-                            <div className="col-md-6 mb-4">
-                                <Form.Label>Assign Faculty Members (Hold Ctrl to select multiple)</Form.Label>
-                                <Form.Select multiple value={formData.assignedFaculty} onChange={e => setFormData({...formData, assignedFaculty: Array.from(e.target.selectedOptions, option => option.value)})}>
+                            <div className="col-md-6 mb-2">
+                                <Form.Label className="fw-medium text-muted small text-uppercase">Assign Faculty (Select Multiple)</Form.Label>
+                                <Form.Select multiple value={formData.assignedFaculty} onChange={e => setFormData({...formData, assignedFaculty: Array.from(e.target.selectedOptions, option => option.value)})} style={{ height: '120px' }}>
                                     {facultyList.map(f => <option key={f._id} value={f._id}>{f.name}</option>)}
                                 </Form.Select>
                             </div>
-                            <div className="col-md-6 mb-4">
-                                <Form.Label>Assign Supporting Staff (Hold Ctrl to select multiple)</Form.Label>
-                                <Form.Select multiple value={formData.assignedStaff} onChange={e => setFormData({...formData, assignedStaff: Array.from(e.target.selectedOptions, option => option.value)})}>
+                            <div className="col-md-6 mb-2">
+                                <Form.Label className="fw-medium text-muted small text-uppercase">Assign Staff (Select Multiple)</Form.Label>
+                                <Form.Select multiple value={formData.assignedStaff} onChange={e => setFormData({...formData, assignedStaff: Array.from(e.target.selectedOptions, option => option.value)})} style={{ height: '120px' }}>
                                     {staffList.map(s => <option key={s._id} value={s._id}>{s.name} ({s.workType})</option>)}
                                 </Form.Select>
                             </div>
                         </div>
-                        <Button variant="primary" type="submit" className="w-100">Save Event</Button>
                     </Form>
                 </Modal.Body>
+                <Modal.Footer style={{ borderTop: 'none', padding: '1.5rem', backgroundColor: '#f8f9fb', borderRadius: '0 0 16px 16px' }}>
+                    <Button variant="light" onClick={() => setShowModal(false)} className="px-4">Cancel</Button>
+                    <Button variant="primary" onClick={handleSave} className="px-4">Confirm & Save</Button>
+                </Modal.Footer>
             </Modal>
-        </div>
+        </motion.div>
     );
 };
 

@@ -1,11 +1,19 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Row, Col, Card, Modal } from 'react-bootstrap';
-import { Calendar as CalendarIcon, Clock, MapPin, Users, NotebookText } from 'lucide-react';
+import { Row, Col, Card, Modal, Button } from 'react-bootstrap';
+import { Calendar as CalendarIcon, Clock, MapPin, Users, NotebookText, TrendingUp, Plus } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+// FullCalendar Imports
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import interactionPlugin from '@fullcalendar/interaction';
 
 const Dashboard = () => {
     const { user } = useContext(AuthContext);
+    const navigate = useNavigate();
     const [stats, setStats] = useState({ eventsToday: 0, upcomingEvents: 0, totalFaculty: 0, totalStaff: 0 });
     const [events, setEvents] = useState([]);
     const [selectedEvent, setSelectedEvent] = useState(null);
@@ -19,116 +27,186 @@ const Dashboard = () => {
 
     const fetchStats = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/events/stats', {
-                headers: { Authorization: `Bearer ${user.token}` }
-            });
+            const res = await axios.get('http://localhost:5000/api/events/stats', { headers: { Authorization: `Bearer ${user.token}` } });
             setStats(res.data);
-        } catch (error) {
-            console.error('Error fetching stats:', error);
-        }
+        } catch (error) { console.error('Error fetching stats:', error); }
     };
 
     const fetchEvents = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/events', {
-                headers: { Authorization: `Bearer ${user.token}` }
-            });
+            const res = await axios.get('http://localhost:5000/api/events', { headers: { Authorization: `Bearer ${user.token}` } });
             setEvents(res.data);
-        } catch (error) {
-            console.error('Error fetching events:', error);
-        }
+        } catch (error) { console.error('Error fetching events:', error); }
     };
 
-    // A simple list view for events since standard React Calendar usually requires react-calendar lib
-    // Following minimalistic SaaS guidelines, we will display an elegant interactive timeline/list
+    const calendarEvents = events.map(ev => {
+        const startDateTime = new Date(`${ev.date.split('T')[0]}T${ev.startTime}`);
+        const endDateTime = new Date(`${ev.date.split('T')[0]}T${ev.endTime}`);
+        return {
+            id: ev._id,
+            title: ev.title,
+            start: startDateTime,
+            end: endDateTime,
+            extendedProps: ev
+        };
+    });
+
+    const handleEventClick = (info) => {
+        setSelectedEvent(info.event.extendedProps);
+    };
+
+    const containerVariants = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.1 } } };
+    const itemVariants = { hidden: { opacity: 0, y: 15 }, show: { opacity: 1, y: 0, transition: { duration: 0.4 } } };
+
     return (
-        <div>
-            <h4 className="mb-4" style={{ fontWeight: 600 }}>Institutional Analytics</h4>
-            <Row className="mb-5">
-                <Col md={3}>
-                    <Card className="p-4 border-0 shadow-sm text-center">
-                        <h6 className="text-muted text-uppercase mb-2">Events Today</h6>
-                        <h2 style={{ color: 'var(--primary-color)', fontWeight: 700 }}>{stats.eventsToday}</h2>
-                    </Card>
-                </Col>
-                <Col md={3}>
-                    <Card className="p-4 border-0 shadow-sm text-center">
-                        <h6 className="text-muted text-uppercase mb-2">Upcoming Events</h6>
-                        <h2 style={{ color: 'var(--primary-color)', fontWeight: 700 }}>{stats.upcomingEvents}</h2>
-                    </Card>
-                </Col>
-                <Col md={3}>
-                    <Card className="p-4 border-0 shadow-sm text-center">
-                        <h6 className="text-muted text-uppercase mb-2">Total Faculty</h6>
-                        <h2 style={{ color: 'var(--primary-color)', fontWeight: 700 }}>{stats.totalFaculty}</h2>
-                    </Card>
-                </Col>
-                <Col md={3}>
-                    <Card className="p-4 border-0 shadow-sm text-center">
-                        <h6 className="text-muted text-uppercase mb-2">Total Staff</h6>
-                        <h2 style={{ color: 'var(--primary-color)', fontWeight: 700 }}>{stats.totalStaff}</h2>
-                    </Card>
-                </Col>
+        <motion.div variants={containerVariants} initial="hidden" animate="show">
+            <div className="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h3 style={{ fontWeight: 700, color: 'var(--primary-color)' }}>Overview</h3>
+                    <p className="text-muted mb-0">Here's what's happening at your institution today.</p>
+                </div>
+                <div className="d-flex gap-3">
+                    <Button variant="light" className="d-flex align-items-center gap-2" onClick={() => navigate('/admin/venues')}>
+                        <MapPin size={18} /> Manage Venues
+                    </Button>
+                    <Button variant="primary" className="d-flex align-items-center gap-2" onClick={() => navigate('/admin/events')}>
+                        <Plus size={18} /> Schedule Event
+                    </Button>
+                </div>
+            </div>
+
+            <Row className="mb-4">
+                {[
+                    { label: 'Events Today', value: stats.eventsToday, trend: '+2 than yesterday', icon: CalendarIcon, color: 'glass-icon-primary' },
+                    { label: 'Upcoming Events', value: stats.upcomingEvents, trend: 'Next 7 days', icon: Clock, color: 'glass-icon-warning' },
+                    { label: 'Active Faculty', value: stats.totalFaculty, trend: '+5% this month', icon: Users, color: 'glass-icon-success' },
+                    { label: 'Support Staff', value: stats.totalStaff, trend: 'Stable workforce', icon: NotebookText, color: 'glass-icon-primary' }
+                ].map((stat, idx) => (
+                    <Col lg={3} sm={6} key={idx} className="mb-3">
+                        <motion.div variants={itemVariants}>
+                            <Card className="p-4 h-100 border-0 shadow-sm" style={{ backgroundColor: '#fff' }}>
+                                <div className="d-flex justify-content-between align-items-start mb-3">
+                                    <div className={`glass-icon ${stat.color}`}>
+                                        <stat.icon size={24} />
+                                    </div>
+                                    <span style={{ fontSize: '0.85rem' }} className={stat.trend.includes('+') ? 'text-trend-up' : 'text-muted'}>
+                                        {stat.trend.includes('+') && <TrendingUp size={14} className="me-1" />}
+                                        {stat.trend}
+                                    </span>
+                                </div>
+                                <h3 style={{ fontWeight: 700, color: 'var(--primary-color)' }} className="mb-1">{stat.value}</h3>
+                                <p className="text-muted mb-0 fw-medium" style={{ fontSize: '0.9rem' }}>{stat.label}</p>
+                            </Card>
+                        </motion.div>
+                    </Col>
+                ))}
             </Row>
 
-            <h4 className="mb-4" style={{ fontWeight: 600 }}>Event Calendar (Timeline)</h4>
             <Row>
-                {events.length === 0 ? <p className="text-muted">No events scheduled.</p> : (
-                    events.map(ev => {
-                        const evtDate = new Date(ev.date).toLocaleDateString();
-                        return (
-                            <Col md={4} key={ev._id} className="mb-4">
-                                <Card className="p-4 shadow-sm border-0 h-100" style={{ cursor: 'pointer' }} onClick={() => setSelectedEvent(ev)}>
-                                    <div className="d-flex align-items-center gap-2 mb-2">
-                                        <CalendarIcon size={18} color="var(--primary-color)" />
-                                        <span className="fw-semibold">{evtDate}</span>
+                <Col lg={8} className="mb-4">
+                    <motion.div variants={itemVariants} className="h-100">
+                        <Card className="p-4 border-0 shadow-sm h-100">
+                            <h5 className="mb-4 fw-bold">Event Calendar</h5>
+                            <div className="flex-grow-1" style={{ minHeight: '500px' }}>
+                                <FullCalendar
+                                    plugins={[dayGridPlugin, interactionPlugin]}
+                                    initialView="dayGridMonth"
+                                    events={calendarEvents}
+                                    eventClick={handleEventClick}
+                                    headerToolbar={{ left: 'prev,next today', center: 'title', right: 'dayGridMonth,dayGridWeek' }}
+                                    height="100%"
+                                    eventTimeFormat={{ hour: 'numeric', minute: '2-digit', meridiem: 'short' }}
+                                    eventDisplay="block"
+                                    eventBackgroundColor="var(--accent-color)"
+                                    eventBorderColor="var(--accent-color)"
+                                />
+                            </div>
+                        </Card>
+                    </motion.div>
+                </Col>
+                <Col lg={4} className="mb-4">
+                    <motion.div variants={itemVariants} className="h-100">
+                        <Card className="p-4 border-0 shadow-sm h-100">
+                            <div className="d-flex justify-content-between align-items-center mb-4">
+                                <h5 className="fw-bold mb-0">Recent Activity</h5>
+                                <span className="badge bg-light text-dark">Latest</span>
+                            </div>
+                            <div className="activity-timeline">
+                                {events.slice(0, 5).map((ev, idx) => (
+                                    <div key={ev._id} className="d-flex mb-4 position-relative">
+                                        <div className="d-flex flex-column align-items-center me-3">
+                                            <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: 'var(--accent-color)', zIndex: 2 }}></div>
+                                            {idx !== 4 && <div style={{ width: '2px', height: '100%', backgroundColor: 'rgba(0,0,0,0.05)', position: 'absolute', top: '12px', left: '5px' }}></div>}
+                                        </div>
+                                        <div>
+                                            <p className="mb-1 fw-semibold text-dark" style={{ fontSize: '0.95rem' }}>{ev.title}</p>
+                                            <p className="text-muted mb-0" style={{ fontSize: '0.85rem' }}>Scheduled for {new Date(ev.date).toLocaleDateString()} at {ev.startTime}</p>
+                                        </div>
                                     </div>
-                                    <h5 className="mb-2">{ev.title}</h5>
-                                    <div className="d-flex align-items-center gap-2 text-muted mb-1" style={{ fontSize: '14px' }}>
-                                        <Clock size={16} /> {ev.startTime} - {ev.endTime}
-                                    </div>
-                                    <div className="d-flex align-items-center gap-2 text-muted" style={{ fontSize: '14px' }}>
-                                        <MapPin size={16} /> {ev.venue?.name || 'TBA'}
-                                    </div>
-                                </Card>
-                            </Col>
-                        );
-                    })
-                )}
+                                ))}
+                                {events.length === 0 && <p className="text-muted text-center py-4">No recent activity found.</p>}
+                            </div>
+                        </Card>
+                    </motion.div>
+                </Col>
             </Row>
 
-            {/* Event Modal */}
-            <Modal show={!!selectedEvent} onHide={() => setSelectedEvent(null)} centered>
-                <Modal.Header closeButton className="border-0 pb-0">
-                    <Modal.Title style={{ fontWeight: 600 }}>{selectedEvent?.title}</Modal.Title>
+            {/* Premium Event Details Modal */}
+            <Modal show={!!selectedEvent} onHide={() => setSelectedEvent(null)} centered size="md">
+                <Modal.Header closeButton style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', padding: '1.5rem', backgroundColor: '#f8f9fb', borderRadius: '16px 16px 0 0' }}>
+                    <Modal.Title style={{ fontWeight: 700, color: 'var(--primary-color)' }}>{selectedEvent?.title}</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>
-                    <div className="d-flex align-items-center gap-2 mb-3 text-muted">
-                        <NotebookText size={18}/> <span>{selectedEvent?.description}</span>
-                    </div>
-                    <Row className="mb-3">
+                <Modal.Body className="p-4">
+                    {selectedEvent?.description && (
+                        <div className="p-3 mb-4 rounded" style={{ backgroundColor: 'rgba(108, 99, 255, 0.05)', color: 'var(--accent-color)' }}>
+                            <NotebookText size={18} className="me-2"/> <span style={{ fontSize: '0.95rem' }}>{selectedEvent.description}</span>
+                        </div>
+                    )}
+                    
+                    <Row className="gy-4 mb-4">
                         <Col sm={6}>
-                            <div className="mb-2"><CalendarIcon size={16}/> <strong>Date:</strong> {new Date(selectedEvent?.date).toLocaleDateString()}</div>
-                            <div className="mb-2"><Clock size={16}/> <strong>Time:</strong> {selectedEvent?.startTime} - {selectedEvent?.endTime}</div>
-                            <div className="mb-2"><MapPin size={16}/> <strong>Venue:</strong> {selectedEvent?.venue?.name}</div>
+                            <div className="text-muted mb-1" style={{ fontSize: '0.8rem', textTransform: 'uppercase', fontWeight: 600 }}>Schedule</div>
+                            <div className="d-flex align-items-center gap-2 fw-medium text-dark">
+                                <CalendarIcon size={16} className="text-muted" /> {new Date(selectedEvent?.date).toLocaleDateString()}
+                            </div>
+                            <div className="d-flex align-items-center gap-2 mt-1 text-muted" style={{ fontSize: '0.9rem' }}>
+                                <Clock size={16} /> {selectedEvent?.startTime} - {selectedEvent?.endTime}
+                            </div>
                         </Col>
                         <Col sm={6}>
-                            <div className="mb-2"><strong>Type:</strong> {selectedEvent?.participationType}</div>
-                            {selectedEvent?.participationType === 'Team' && <div className="mb-2"><strong>Team Size:</strong> {selectedEvent?.teamSize}</div>}
+                            <div className="text-muted mb-1" style={{ fontSize: '0.8rem', textTransform: 'uppercase', fontWeight: 600 }}>Location & Type</div>
+                            <div className="d-flex align-items-center gap-2 fw-medium text-dark">
+                                <MapPin size={16} className="text-muted" /> {selectedEvent?.venue?.name || 'TBA'}
+                            </div>
+                            <div className="d-flex align-items-center gap-2 mt-1 text-muted" style={{ fontSize: '0.9rem' }}>
+                                <Users size={16} /> {selectedEvent?.participationType} {selectedEvent?.participationType === 'Team' && `(Size: ${selectedEvent?.teamSize})`}
+                            </div>
                         </Col>
                     </Row>
-                    <hr />
-                    <h6>Assigned Faculty</h6>
-                    <ul className="mb-3 text-muted">
-                        {selectedEvent?.assignedFaculty?.length > 0 ? selectedEvent.assignedFaculty.map(f => <li key={f._id}>{f.name}</li>) : <li>None</li>}
-                    </ul>
-                    <h6>Assigned Staff</h6>
-                    <ul className="text-muted">
-                        {selectedEvent?.assignedStaff?.length > 0 ? selectedEvent.assignedStaff.map(s => <li key={s._id}>{s.name} ({s.workType})</li>) : <li>None</li>}
-                    </ul>
+
+                    <div className="border-top pt-4">
+                        <div className="text-muted mb-2" style={{ fontSize: '0.8rem', textTransform: 'uppercase', fontWeight: 600 }}>Assigned Resources</div>
+                        <Row>
+                            <Col sm={6}>
+                                <div className="fw-medium text-dark mb-1" style={{ fontSize: '0.9rem' }}>Faculty</div>
+                                <ul className="text-muted list-unstyled" style={{ fontSize: '0.9rem' }}>
+                                    {selectedEvent?.assignedFaculty?.length > 0 ? selectedEvent.assignedFaculty.map(f => <li key={f._id} className="mb-1">• {f.name}</li>) : <li>None</li>}
+                                </ul>
+                            </Col>
+                            <Col sm={6}>
+                                <div className="fw-medium text-dark mb-1" style={{ fontSize: '0.9rem' }}>Support Staff</div>
+                                <ul className="text-muted list-unstyled" style={{ fontSize: '0.9rem' }}>
+                                    {selectedEvent?.assignedStaff?.length > 0 ? selectedEvent.assignedStaff.map(s => <li key={s._id} className="mb-1">• {s.name} <span style={{ opacity: 0.7 }}>({s.workType})</span></li>) : <li>None</li>}
+                                </ul>
+                            </Col>
+                        </Row>
+                    </div>
                 </Modal.Body>
+                <Modal.Footer style={{ borderTop: 'none', padding: '1.5rem', backgroundColor: '#f8f9fb', borderRadius: '0 0 16px 16px' }}>
+                    <Button variant="light" onClick={() => setSelectedEvent(null)} className="w-100">Close</Button>
+                </Modal.Footer>
             </Modal>
-        </div>
+        </motion.div>
     );
 };
 
