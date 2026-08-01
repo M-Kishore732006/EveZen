@@ -15,15 +15,19 @@ const getAvailableAndBookedVenues = async (req, res) => {
              return res.status(400).json({ message: 'Please provide date, startTime, and endTime' });
         }
 
-        const events = await Event.find({ date: new Date(date) }).populate('assignedStaff');
-        const bookedVenueIds = events.map(e => e.venue.toString());
+        const eventsOnDate = await Event.find({ date: new Date(date) });
+        const overlappingEvents = eventsOnDate.filter(ev => {
+            return (startTime < ev.endTime) && (ev.startTime < endTime);
+        });
+        
+        const bookedVenueIds = overlappingEvents.map(e => e.venue.toString());
 
         const allVenues = await Venue.find();
         const availableVenues = allVenues.filter(v => !bookedVenueIds.includes(v._id.toString()));
         const bookedVenues = allVenues.filter(v => bookedVenueIds.includes(v._id.toString()));
 
         const bookedDetails = bookedVenues.map(v => {
-            const ev = events.find(e => e.venue.toString() === v._id.toString());
+            const ev = overlappingEvents.find(e => e.venue.toString() === v._id.toString());
             return { venue: v, event: ev };
         });
 

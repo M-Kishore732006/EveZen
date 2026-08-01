@@ -125,9 +125,44 @@ const VenueManagement = () => {
             <Card className="flex-grow-1 p-0 shadow-sm border-0 d-flex flex-column" style={{ overflow: 'hidden' }}>
                 <div className="flex-grow-1 p-4 event-card-bg" style={{ overflowY: 'auto' }}>
                     
+                    {/* Render Available or All Venues */}
+                    <div className={detailedVenues.booked.length > 0 ? "mb-5" : ""}>
+                        <h6 className="text-uppercase fw-bold mb-3" style={{ fontSize: '0.8rem', letterSpacing: '1px', color: (filterDate) ? '#2ecc71' : 'var(--primary-color)' }}>
+                            {filterDate ? `Available Spaces (${detailedVenues.available.length})` : `All Venues (${venues.length})`}
+                        </h6>
+                        <motion.div variants={containerVariants} initial="hidden" animate="show" className="row gy-3">
+                            {detailedVenues.available.length === 0 ? <p className="text-muted">No available venues found for this filter.</p> : null}
+                            {detailedVenues.available.map((v) => (
+                                <div className="col-md-6 col-lg-4" key={v._id}>
+                                    <motion.div variants={itemVariants} className="h-100">
+                                        <Card className="border-0 shadow-sm h-100 overflow-hidden" style={{ outline: filterDate ? '1px solid rgba(46, 204, 113, 0.4)' : 'none' }}>
+                                            <div className="p-3" style={{ borderLeft: filterDate ? '4px solid #2ecc71' : '4px solid var(--accent-color)' }}>
+                                                <div className="d-flex justify-content-between align-items-start mb-2">
+                                                    <h6 className="fw-bold mb-0 text-dark">{v.name}</h6>
+                                                    {filterDate && <Badge bg="success">Available</Badge>}
+                                                </div>
+                                                <div className="text-muted d-flex align-items-center gap-2 mb-1" style={{ fontSize: '0.85rem' }}>
+                                                    <MapPin size={14}/> {v.location}
+                                                </div>
+                                                <div className="text-muted d-flex align-items-center gap-2" style={{ fontSize: '0.85rem' }}>
+                                                    <Users size={14}/> Capacity: {v.capacity}
+                                                </div>
+                                                
+                                                <div className="mt-3 d-flex gap-2">
+                                                    <Button variant="light" size="sm" className="flex-grow-1 rounded-pill" onClick={() => handleEdit(v)}><Edit size={14} className="me-1"/> Edit Config</Button>
+                                                    <Button variant="outline-danger" size="sm" className="rounded-pill border-0" onClick={() => handleDelete(v._id)}><Trash size={14}/></Button>
+                                                </div>
+                                            </div>
+                                        </Card>
+                                    </motion.div>
+                                </div>
+                            ))}
+                        </motion.div>
+                    </div>
+
                     {/* Render Booked Venues if query exists */}
                     {detailedVenues.booked.length > 0 && (
-                        <div className="mb-5">
+                        <div>
                             <h6 className="text-uppercase fw-bold text-danger mb-3" style={{ fontSize: '0.8rem', letterSpacing: '1px' }}>Unavailable / Booked Spaces ({detailedVenues.booked.length})</h6>
                             <motion.div variants={containerVariants} initial="hidden" animate="show" className="row gy-3">
                                 {detailedVenues.booked.map((b) => (
@@ -158,41 +193,6 @@ const VenueManagement = () => {
                             </motion.div>
                         </div>
                     )}
-
-                    {/* Render Available or All Venues */}
-                    <div>
-                        <h6 className="text-uppercase fw-bold mb-3" style={{ fontSize: '0.8rem', letterSpacing: '1px', color: (filterDate) ? '#2ecc71' : 'var(--primary-color)' }}>
-                            {filterDate ? `Available Spaces (${detailedVenues.available.length})` : `All Venues (${venues.length})`}
-                        </h6>
-                        <motion.div variants={containerVariants} initial="hidden" animate="show" className="row gy-3">
-                            {detailedVenues.available.length === 0 ? <p className="text-muted">No available venues found for this filter.</p> : null}
-                            {detailedVenues.available.map((v) => (
-                                <div className="col-md-6 col-lg-4" key={v._id}>
-                                    <motion.div variants={itemVariants} className="h-100">
-                                        <Card className="border-0 shadow-sm h-100" style={{ outline: filterDate ? '1px solid rgba(46, 204, 113, 0.4)' : 'none' }}>
-                                            <div className="p-3" style={{ borderLeft: filterDate ? '4px solid #2ecc71' : '4px solid var(--accent-color)' }}>
-                                                <div className="d-flex justify-content-between align-items-start mb-2">
-                                                    <h6 className="fw-bold mb-0 text-dark">{v.name}</h6>
-                                                    {filterDate && <Badge bg="success">Available</Badge>}
-                                                </div>
-                                                <div className="text-muted d-flex align-items-center gap-2 mb-1" style={{ fontSize: '0.85rem' }}>
-                                                    <MapPin size={14}/> {v.location}
-                                                </div>
-                                                <div className="text-muted d-flex align-items-center gap-2" style={{ fontSize: '0.85rem' }}>
-                                                    <Users size={14}/> Capacity: {v.capacity}
-                                                </div>
-                                                
-                                                <div className="mt-3 d-flex gap-2">
-                                                    <Button variant="light" size="sm" className="flex-grow-1 rounded-pill" onClick={() => handleEdit(v)}><Edit size={14} className="me-1"/> Edit Config</Button>
-                                                    <Button variant="outline-danger" size="sm" className="rounded-pill border-0" onClick={() => handleDelete(v._id)}><Trash size={14}/></Button>
-                                                </div>
-                                            </div>
-                                        </Card>
-                                    </motion.div>
-                                </div>
-                            ))}
-                        </motion.div>
-                    </div>
 
                 </div>
             </Card>

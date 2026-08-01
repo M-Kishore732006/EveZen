@@ -76,19 +76,14 @@ const EmployeeDashboard = () => {
 
     return (
         <motion.div variants={containerVariants} initial="hidden" animate="show" className="h-100">
-            <motion.div variants={itemVariants}>
-                <Card className="border-0 shadow-sm mb-4 overflow-hidden">
-                    <div className="p-5 d-flex justify-content-between align-items-center flex-wrap gap-4 position-relative">
-                        <div style={{ position: 'absolute', right: '0', top: '0', height: '100%', width: '400px', background: 'linear-gradient(270deg, rgba(108, 99, 255, 0.1) 0%, rgba(255,255,255,0) 100%)', zIndex: 0 }}></div>
-                        <div style={{ zIndex: 1 }}>
-                            <h2 className="fw-bold mb-2">Welcome back, {user?.name.split(' ')[0]}</h2>
-                            <p className="mb-0 text-muted fs-5">You have {stats.assigned} active assignments requiring your coordination today.</p>
-                        </div>
-                        <Button variant="primary" size="lg" className="px-4 shadow-sm z-1" onClick={() => navigate(`${basePath}/assigned`)}>
-                            View Assignments <ArrowRight size={20} className="ms-2"/>
-                        </Button>
-                    </div>
-                </Card>
+            <motion.div variants={itemVariants} className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                <div>
+                    <h3 style={{ fontWeight: 700, color: 'var(--primary-color)' }}>Welcome back, {user?.name.split(' ')[0]}</h3>
+                    <p className="text-muted mb-0">You have {stats.assigned} active assignments requiring your coordination today.</p>
+                </div>
+                <Button variant="primary" className="d-flex align-items-center gap-2" onClick={() => navigate(`${basePath}/assigned`)}>
+                    View Assignments <ArrowRight size={18} />
+                </Button>
             </motion.div>
 
             <Row className="mb-4">

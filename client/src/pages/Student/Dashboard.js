@@ -83,19 +83,14 @@ const Dashboard = () => {
 
     return (
         <motion.div variants={containerVariants} initial="hidden" animate="show" className="h-100">
-            {/* Hero Section */}
-            <motion.div variants={itemVariants}>
-                <Card className="border-0 shadow-sm mb-4" style={{ background: 'linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%)', color: 'white' }}>
-                    <div className="p-5 d-flex justify-content-between align-items-center flex-wrap gap-4">
-                        <div>
-                            <h2 className="fw-bold mb-2">Welcome back, {user?.name.split(' ')[0]} 👋</h2>
-                            <p className="mb-0 text-white-50 fs-5">Explore and participate in upcoming campus events and hackathons.</p>
-                        </div>
-                        <Button variant="light" size="lg" className="px-4 shadow-sm" onClick={() => navigate('/student/browse')} style={{ color: 'var(--primary-color)', fontWeight: 600 }}>
-                            Browse Events <ArrowRight size={20} className="ms-2"/>
-                        </Button>
-                    </div>
-                </Card>
+            <motion.div variants={itemVariants} className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                <div>
+                    <h3 style={{ fontWeight: 700, color: 'var(--primary-color)' }}>Welcome back, {user?.name.split(' ')[0]} 👋</h3>
+                    <p className="text-muted mb-0">Explore and participate in upcoming campus events and hackathons.</p>
+                </div>
+                <Button variant="primary" className="d-flex align-items-center gap-2" onClick={() => navigate('/student/browse')}>
+                    Browse Events <ArrowRight size={18} />
+                </Button>
             </motion.div>
 
             <Row className="mb-4">

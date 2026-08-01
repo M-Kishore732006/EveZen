@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { Card, Button, Form, Row, Col, Badge, Alert } from 'react-bootstrap';
 import { motion } from 'framer-motion';
-import { User, Mail, Phone, Briefcase, Lock } from 'lucide-react';
+import { User, Mail, Phone, Briefcase, Lock, Eye, EyeOff } from 'lucide-react';
 import axios from 'axios';
 
 const Profile = () => {
@@ -10,6 +10,10 @@ const Profile = () => {
     
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
+
+    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+
     const [msg, setMsg] = useState({ type: '', text: '' });
     const [loading, setLoading] = useState(false);
 
@@ -101,15 +105,21 @@ const Profile = () => {
                                 <Col md={4}>
                                     <Form.Label className="text-muted small fw-bold text-uppercase">Current Password</Form.Label>
                                     <div className="position-relative">
-                                        <Lock size={18} className="position-absolute text-muted" style={{ left: '12px', top: '12px' }}/>
-                                        <Form.Control type="password" placeholder="Enter current password" style={{ paddingLeft: '40px' }} value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} required />
+                                        <Lock size={18} className="position-absolute text-muted" style={{ left: '12px', top: '50%', transform: 'translateY(-50%)' }}/>
+                                        <Form.Control type={showCurrentPassword ? "text" : "password"} placeholder="Enter current password" style={{ paddingLeft: '40px', paddingRight: '40px' }} value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} required />
+                                        <div className="position-absolute text-muted" onClick={() => setShowCurrentPassword(!showCurrentPassword)} style={{ right: '12px', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', zIndex: 10 }}>
+                                            {showCurrentPassword ? <EyeOff size={18}/> : <Eye size={18}/>}
+                                        </div>
                                     </div>
                                 </Col>
                                 <Col md={4}>
                                     <Form.Label className="text-muted small fw-bold text-uppercase">New Password</Form.Label>
                                     <div className="position-relative">
-                                        <Lock size={18} className="position-absolute text-muted" style={{ left: '12px', top: '12px' }}/>
-                                        <Form.Control type="password" placeholder="Enter new password" style={{ paddingLeft: '40px' }} value={newPassword} onChange={e => setNewPassword(e.target.value)} required minLength={6} />
+                                        <Lock size={18} className="position-absolute text-muted" style={{ left: '12px', top: '50%', transform: 'translateY(-50%)' }}/>
+                                        <Form.Control type={showNewPassword ? "text" : "password"} placeholder="Enter new password" style={{ paddingLeft: '40px', paddingRight: '40px' }} value={newPassword} onChange={e => setNewPassword(e.target.value)} required minLength={6} />
+                                        <div className="position-absolute text-muted" onClick={() => setShowNewPassword(!showNewPassword)} style={{ right: '12px', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', zIndex: 10 }}>
+                                            {showNewPassword ? <EyeOff size={18}/> : <Eye size={18}/>}
+                                        </div>
                                     </div>
                                 </Col>
                                 <Col md={4}>

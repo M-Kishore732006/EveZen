@@ -84,11 +84,6 @@ const AdminForums = () => {
                 <Card className="flex-grow-1 border-0 shadow-sm d-flex flex-column overflow-hidden">
                     <div className="p-4 border-bottom bg-light bg-opacity-50 d-flex justify-content-between align-items-center flex-wrap gap-3">
                         <h5 className="fw-bold mb-0 text-dark">{activeEvent ? activeEvent.title : 'Select an Event'} Forum</h5>
-                        {true && (
-                            <Button variant="primary" size="sm" className="rounded-pill d-flex align-items-center px-4 shadow-sm">
-                                <Plus size={16} className="me-2"/> Create Post
-                            </Button>
-                        )}
                     </div>
                     
                     <div className="px-4 py-2 border-bottom shadow-sm z-1 bg-white">

@@ -2,9 +2,12 @@ import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { Form, Button, Card, Container, Alert } from 'react-bootstrap';
+import { Eye, EyeOff } from 'lucide-react';
 
 const Signup = () => {
     const [formData, setFormData] = useState({ name: '', email: '', phone: '', password: '', confirmPassword: '' });
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [error, setError] = useState('');
     const { signup } = useContext(AuthContext);
     const navigate = useNavigate();
@@ -55,11 +58,21 @@ const Signup = () => {
                     </Form.Group>
                     <Form.Group className="mb-3">
                         <Form.Label>Password</Form.Label>
-                        <Form.Control type="password" name="password" required value={formData.password} onChange={handleChange} />
+                        <div className="position-relative">
+                            <Form.Control type={showPassword ? "text" : "password"} name="password" required value={formData.password} onChange={handleChange} />
+                            <div className="position-absolute text-muted" onClick={() => setShowPassword(!showPassword)} style={{ right: '12px', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer' }}>
+                                {showPassword ? <EyeOff size={18}/> : <Eye size={18}/>}
+                            </div>
+                        </div>
                     </Form.Group>
                     <Form.Group className="mb-4">
                         <Form.Label>Confirm Password</Form.Label>
-                        <Form.Control type="password" name="confirmPassword" required value={formData.confirmPassword} onChange={handleChange} />
+                        <div className="position-relative">
+                            <Form.Control type={showConfirmPassword ? "text" : "password"} name="confirmPassword" required value={formData.confirmPassword} onChange={handleChange} />
+                            <div className="position-absolute text-muted" onClick={() => setShowConfirmPassword(!showConfirmPassword)} style={{ right: '12px', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer' }}>
+                                {showConfirmPassword ? <EyeOff size={18}/> : <Eye size={18}/>}
+                            </div>
+                        </div>
                     </Form.Group>
                     <Button variant="primary" type="submit" className="w-100 mb-3">
                         Register Account

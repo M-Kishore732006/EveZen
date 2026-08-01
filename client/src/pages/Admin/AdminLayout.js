@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutDashboard, Calendar, MapPin, Users, LogOut, Menu, Bell, Search, Moon, Sun, ChevronDown, MessageSquare } from 'lucide-react';
+import { LayoutDashboard, Calendar, MapPin, Users, User, LogOut, Menu, Bell, Search, Moon, Sun, ChevronDown, MessageSquare } from 'lucide-react';
 import { Dropdown, Badge } from 'react-bootstrap';
 import axios from 'axios';
 
@@ -79,7 +79,8 @@ const AdminLayout = () => {
         { path: '/admin/events', icon: Calendar, label: 'Events' },
         { path: '/admin/venues', icon: MapPin, label: 'Venues' },
         { path: '/admin/staff', icon: Users, label: 'Staff' },
-        { path: '/admin/forums', icon: MessageSquare, label: 'Discussion Forums' }
+        { path: '/admin/forums', icon: MessageSquare, label: 'Discussion Forums' },
+        { path: '/admin/profile', icon: User, label: 'Profile' }
     ];
 
     return (

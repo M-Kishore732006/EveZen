@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import axios from 'axios';
 import { Card, Button, Badge, Row, Col, Form, ProgressBar, Alert } from 'react-bootstrap';
-import { Calendar, MapPin, Clock, Users, ArrowLeft, CheckCircle, Navigation, Info, MessageSquare, User } from 'lucide-react';
+import { Calendar, MapPin, Clock, Users, ArrowLeft, CheckCircle, Navigation, Info, MessageSquare, User, Trash } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 
@@ -46,6 +46,12 @@ const EventDetails = () => {
 
     const handleAddMember = () => {
         if (members.length < (event?.teamSize || 2)) setMembers([...members, { name: '', email: '' }]);
+    };
+
+    const handleRemoveMember = (idx) => {
+        const nm = [...members];
+        nm.splice(idx, 1);
+        setMembers(nm);
     };
 
     const submitRegistration = async (e) => {
@@ -139,7 +145,10 @@ const EventDetails = () => {
                                 </div>
                                 {members.map((m, idx) => (
                                     <div key={idx} className="p-3 border rounded mb-3 bg-light bg-opacity-50">
-                                        <h6 className="fw-bold mb-3" style={{ fontSize: '0.85rem', color: 'var(--primary-color)' }}>Member {idx + 1}</h6>
+                                        <div className="d-flex justify-content-between align-items-center mb-3">
+                                            <h6 className="fw-bold mb-0" style={{ fontSize: '0.85rem', color: 'var(--primary-color)' }}>Member {idx + 1}</h6>
+                                            <Button variant="link" className="text-danger p-0 border-0" onClick={() => handleRemoveMember(idx)}><Trash size={16}/></Button>
+                                        </div>
                                         <Row className="gy-3">
                                             <Col md={6}><Form.Control required placeholder="Full Name" value={m.name} onChange={e => { const nm = [...members]; nm[idx].name = e.target.value; setMembers(nm); }} /></Col>
                                             <Col md={6}><Form.Control required type="email" placeholder="Email Address" value={m.email} onChange={e => { const nm = [...members]; nm[idx].email = e.target.value; setMembers(nm); }} /></Col>
