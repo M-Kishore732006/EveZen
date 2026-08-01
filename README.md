@@ -2,7 +2,9 @@
 
 EveZen is a modern, responsive, full-stack web application designed for universities and organizations to seamlessly manage events, ticketing, roles, and automated attendance tracking. Built with a premium SaaS-style interface, EveZen provides dedicated workflows for Administrators, Students, Faculty, and Supporting Staff.
 
+# Deployment Link - https://eve-zen-delta.vercel.app
 ## 🚀 Key Features
+
 
 ### User Roles & Workflows
 *   **Administrator**: Complete global oversight. Manage users, create and schedule events, assign venues, assign staff/faculty, and moderate all discussion forums. View analytical dashboards summarizing registration and attendance data.
