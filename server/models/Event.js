@@ -13,7 +13,12 @@ const eventSchema = new mongoose.Schema({
     assignedFaculty: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     assignedStaff: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     registeredStudents: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-    attendedStudents: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
+    attendedStudents: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    teamRegistrations: [{
+        leader: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        teamName: String,
+        members: [{ name: String, email: String }]
+    }]
 }, { timestamps: true });
 
 module.exports = mongoose.model('Event', eventSchema);

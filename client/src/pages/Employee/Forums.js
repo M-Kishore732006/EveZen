@@ -81,7 +81,7 @@ const EmployeeForums = () => {
                 <div style={{ width: '280px' }} className="d-flex flex-column gap-3">
                     <h6 className="text-muted small fw-bold text-uppercase mb-1">Assigned Events</h6>
                     {events.map((ev) => (
-                        <div key={ev._id} onClick={() => setActiveEvent(ev)} className="p-3 rounded-4 shadow-sm fw-medium d-flex align-items-center gap-3" style={{ cursor: 'pointer', backgroundColor: activeEvent?._id === ev._id ? '#fff' : 'transparent', border: activeEvent?._id === ev._id ? '1px solid rgba(108, 99, 255, 0.2)' : '1px solid transparent', color: activeEvent?._id === ev._id ? 'var(--primary-color)' : 'var(--text-muted)', transition: 'all 0.2s' }}>
+                        <div key={ev._id} onClick={() => setActiveEvent(ev)} className="p-3 rounded-4 shadow-sm fw-medium d-flex align-items-center gap-3" style={{ cursor: 'pointer', backgroundColor: activeEvent?._id === ev._id ? 'var(--card-bg)' : 'transparent', border: activeEvent?._id === ev._id ? '1px solid rgba(108, 99, 255, 0.2)' : '1px solid transparent', color: activeEvent?._id === ev._id ? 'var(--primary-color)' : 'var(--text-muted)', transition: 'all 0.2s' }}>
                             <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: activeEvent?._id === ev._id ? 'var(--accent-color)' : 'transparent' }}></div>
                             <span className="text-truncate">{ev.title}</span>
                         </div>
@@ -96,7 +96,7 @@ const EmployeeForums = () => {
                     <div className="px-4 py-2 border-bottom shadow-sm z-1 bg-white">
                         <div className="d-flex p-1" style={{ backgroundColor: 'rgba(0,0,0,0.03)', borderRadius: '12px', width: 'fit-content' }}>
                             {['Announcements', 'Questions', 'Resources'].map(tab => (
-                                <button key={tab} className="border-0 px-4 py-2 small" style={{ borderRadius: '8px', backgroundColor: activeTab === tab ? '#fff' : 'transparent', color: activeTab === tab ? 'var(--primary-color)' : 'var(--text-muted)', fontWeight: activeTab === tab ? 600 : 500, boxShadow: activeTab === tab ? '0 2px 10px rgba(0,0,0,0.05)' : 'none', transition: 'all 0.2s' }} onClick={() => setActiveTab(tab)}>{tab}</button>
+                                <button key={tab} className="border-0 px-4 py-2 small" style={{ borderRadius: '8px', backgroundColor: activeTab === tab ? 'var(--card-bg)' : 'transparent', color: activeTab === tab ? 'var(--primary-color)' : 'var(--text-muted)', fontWeight: activeTab === tab ? 600 : 500, boxShadow: activeTab === tab ? '0 2px 10px rgba(0,0,0,0.05)' : 'none', transition: 'all 0.2s' }} onClick={() => setActiveTab(tab)}>{tab}</button>
                             ))}
                         </div>
                     </div>

@@ -54,10 +54,10 @@ const Profile = () => {
                             style={{ width: '100px', height: '100px', borderRadius: '50%', backgroundColor: 'var(--accent-color)', color: 'white', fontSize: '2.5rem', fontWeight: 'bold' }}>
                             {user?.name?.charAt(0).toUpperCase()}
                         </div>
-                        <h4 className="fw-bold mb-1">{user?.name}</h4>
+                        <h4 className="fw-bold mb-1 text-dark">{user?.name}</h4>
                         <Badge bg="light" text="dark" className="px-3 py-2 border mb-3">{user?.role}</Badge>
                         <hr className="my-2" />
-                        <div className="d-flex align-items-center justify-content-center gap-2 text-muted small mt-3">
+                        <div className="d-flex align-items-center justify-content-center gap-2 text-muted small mt-3 text-dark">
                             <Briefcase size={14} /> EveZen Integrated Profile
                         </div>
                     </Card>
@@ -65,7 +65,7 @@ const Profile = () => {
 
                 <Col md={8}>
                     <Card className="border-0 shadow-sm p-4 mb-4">
-                        <h5 className="fw-bold mb-4">Personal Information</h5>
+                        <h5 className="fw-bold mb-4 text-dark">Personal Information</h5>
                         <Form>
                             <Row className="gy-3">
                                 <Col md={6}>
@@ -98,7 +98,7 @@ const Profile = () => {
                     </Card>
 
                     <Card className="border-0 shadow-sm p-4">
-                        <h5 className="fw-bold mb-4">Security</h5>
+                        <h5 className="fw-bold mb-4 text-dark">Security</h5>
                         {msg.text && <Alert variant={msg.type} className="small py-2">{msg.text}</Alert>}
                         <Form onSubmit={handlePasswordUpdate}>
                             <Row className="gy-3 align-items-end">

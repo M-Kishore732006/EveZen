@@ -103,6 +103,15 @@ const registerForEvent = async (req, res) => {
         }
 
         event.registeredStudents.push(studentId);
+
+        if (event.participationType === 'Team' && req.body.teamName && req.body.members) {
+            event.teamRegistrations.push({
+                leader: studentId,
+                teamName: req.body.teamName,
+                members: req.body.members
+            });
+        }
+
         await event.save();
 
         res.json({ message: 'Successfully registered for event.', event });

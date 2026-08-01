@@ -268,26 +268,50 @@ const EventManagement = () => {
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body className="p-0" style={{ maxHeight: '400px', overflowY: 'auto' }}>
-                    {selectedEventForParticipants?.registeredStudents?.length === 0 ? (
-                        <div className="text-center text-muted p-5">
-                            <Users size={32} className="mb-2" style={{ opacity: 0.3 }} />
-                            <p className="mb-0">No students are currently registered for this event.</p>
-                        </div>
-                    ) : (
-                        <div className="list-group list-group-flush">
-                            {selectedEventForParticipants?.registeredStudents?.map(student => (
-                                <div key={student._id} className="list-group-item d-flex align-items-center gap-3 py-3 px-4">
-                                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'rgba(108, 99, 255, 0.1)', color: 'var(--primary-color)' }} className="d-flex align-items-center justify-content-center fw-bold flex-shrink-0">
-                                        {student.name.charAt(0)}
+                    {(() => {
+                        const participantDisplayList = [];
+                        if (selectedEventForParticipants) {
+                            if (selectedEventForParticipants.participationType === 'Team') {
+                                selectedEventForParticipants.teamRegistrations?.forEach(team => {
+                                    const leaderData = selectedEventForParticipants.registeredStudents?.find(s => String(s._id) === String(team.leader));
+                                    if (leaderData) {
+                                        participantDisplayList.push({ name: leaderData.name, email: leaderData.email, team: team.teamName, role: 'Leader' });
+                                    }
+                                    team.members?.forEach(m => {
+                                        participantDisplayList.push({ name: m.name, email: m.email, team: team.teamName, role: 'Member' });
+                                    });
+                                });
+                            } else {
+                                selectedEventForParticipants.registeredStudents?.forEach(s => {
+                                    participantDisplayList.push({ name: s.name, email: s.email, role: 'Participant' });
+                                });
+                            }
+                        }
+                        
+                        return participantDisplayList.length === 0 ? (
+                            <div className="text-center text-muted p-5">
+                                <Users size={32} className="mb-2" style={{ opacity: 0.3 }} />
+                                <p className="mb-0">No students are currently registered for this event.</p>
+                            </div>
+                        ) : (
+                            <div className="list-group list-group-flush">
+                                {participantDisplayList.map((student, idx) => (
+                                    <div key={idx} className="list-group-item d-flex justify-content-between align-items-center gap-3 py-3 px-4">
+                                        <div className="d-flex align-items-center gap-3">
+                                            <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'rgba(108, 99, 255, 0.1)', color: 'var(--primary-color)' }} className="d-flex align-items-center justify-content-center fw-bold flex-shrink-0">
+                                                {student.name.charAt(0)}
+                                            </div>
+                                            <div>
+                                                <h6 className="mb-0 fw-bold">{student.name} {student.team && <span className="text-muted small fw-normal ms-2">({student.team})</span>}</h6>
+                                                <small className="text-muted">{student.email}</small>
+                                            </div>
+                                        </div>
+                                        {student.role !== 'Participant' && <Badge bg={student.role === 'Leader' ? 'primary' : 'secondary'} className="px-2 py-1 fw-medium">{student.role}</Badge>}
                                     </div>
-                                    <div>
-                                        <h6 className="mb-0 fw-bold">{student.name}</h6>
-                                        <small className="text-muted">{student.email}</small>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
+                                ))}
+                            </div>
+                        );
+                    })()}
                 </Modal.Body>
                 <Modal.Footer className="bg-light border-0">
                     <Button variant="secondary" onClick={() => setShowParticipantsModal(false)}>Close</Button>

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import axios from 'axios';
 import { Card, Button, Badge, Row, Col, Form, ProgressBar, Alert } from 'react-bootstrap';
-import { Calendar, MapPin, Clock, Users, ArrowLeft, CheckCircle, Navigation, Info, MessageSquare, User, Trash } from 'lucide-react';
+import { Calendar, MapPin, Clock, Users, ArrowLeft, CheckCircle, Navigation, Info, MessageSquare, User, Trash, Award } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 
@@ -44,6 +44,56 @@ const EventDetails = () => {
         } catch (error) { console.error(error); }
     };
 
+    const generateCertificate = (studentName, eventTitle, eventDate) => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 1000;
+        canvas.height = 700;
+        const ctx = canvas.getContext('2d');
+        
+        // Background
+        ctx.fillStyle = '#0F172A';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Border
+        ctx.strokeStyle = '#6C63FF';
+        ctx.lineWidth = 16;
+        ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+        ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(40, 40, canvas.width - 80, canvas.height - 80);
+        
+        // Content
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = 'bold 54px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('CERTIFICATE OF PARTICIPATION', canvas.width / 2, 160);
+        
+        ctx.fillStyle = '#94A3B8';
+        ctx.font = 'italic 28px Arial';
+        ctx.fillText('This proudly certifies that', canvas.width / 2, 260);
+        
+        ctx.fillStyle = '#6C63FF';
+        ctx.font = 'bold 64px Arial';
+        ctx.fillText(studentName.toUpperCase(), canvas.width / 2, 360);
+        
+        ctx.fillStyle = '#94A3B8';
+        ctx.font = '24px Arial';
+        ctx.fillText('has excellently attended and completed the event', canvas.width / 2, 450);
+        
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = 'bold 42px Arial';
+        ctx.fillText(eventTitle, canvas.width / 2, 530);
+        
+        ctx.fillStyle = '#6C63FF';
+        ctx.font = 'bold 20px Arial';
+        ctx.fillText(`Issued: ${new Date(eventDate).toLocaleDateString()}`, canvas.width / 2, 620);
+        
+        const link = document.createElement('a');
+        link.download = `Certificate_${studentName.replace(/ /g, '_')}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    };
+
     const handleAddMember = () => {
         if (members.length < (event?.teamSize || 2)) setMembers([...members, { name: '', email: '' }]);
     };
@@ -58,7 +108,11 @@ const EventDetails = () => {
         e.preventDefault();
         setIsSubmitting(true);
         try {
-            await axios.post(`http://localhost:5000/api/events/${id}/register`, {}, { headers: { Authorization: `Bearer ${user.token}` } });
+            const payload = event.participationType === 'Team' ? {
+                teamName: teamName || `${user.name}'s Team`,
+                members: members
+            } : {};
+            await axios.post(`http://localhost:5000/api/events/${id}/register`, payload, { headers: { Authorization: `Bearer ${user.token}` } });
             setIsSubmitting(false);
             setIsSuccess(true);
             setRegStep(4);
@@ -239,6 +293,68 @@ const EventDetails = () => {
                                             <Badge key={f._id} bg="light" text="dark" className="border px-3 py-2 fw-medium">{f.name}</Badge>
                                         )) : <span className="text-muted">None Assigned</span>}
                                     </div>
+                                    
+                                    {event.participationType === 'Team' && event.teamRegistrations?.some(t => String(t.leader?._id || t.leader) === String(user._id)) && (
+                                        <>
+                                            <hr className="my-5 opacity-10"/>
+                                            <div className="text-muted small fw-bold text-uppercase mb-3">Your Team Details</div>
+                                            {(() => {
+                                                const myTeam = event.teamRegistrations.find(t => String(t.leader?._id || t.leader) === String(user._id));
+                                                const hasAttended = event.attendedStudents?.some(s => String(s._id || s) === String(user._id));
+                                                return (
+                                                    <div className="bg-light bg-opacity-50 p-4 rounded-4 border">
+                                                        <h5 className="fw-bold text-primary mb-3 text-uppercase d-flex align-items-center gap-2"><Users size={20}/> {myTeam.teamName}</h5>
+                                                        <Row className="gy-3">
+                                                            <Col lg={12}>
+                                                                <div className="p-3 bg-white border rounded shadow-sm d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                                                    <div>
+                                                                        <div className="fw-bold text-dark">{user.name} <Badge bg="primary" className="ms-2">Leader</Badge></div>
+                                                                        <div className="text-muted small">{user.email}</div>
+                                                                    </div>
+                                                                    {hasAttended && (
+                                                                        <Button variant="success" size="sm" className="d-flex align-items-center gap-2" onClick={() => generateCertificate(user.name, event.title, event.date)}>
+                                                                            <Award size={16}/> Certificate
+                                                                        </Button>
+                                                                    )}
+                                                                </div>
+                                                            </Col>
+                                                            {myTeam.members?.map((m, idx) => (
+                                                                <Col lg={12} key={idx}>
+                                                                    <div className="p-3 bg-white border rounded shadow-sm d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                                                        <div>
+                                                                            <div className="fw-bold text-dark">{m.name}</div>
+                                                                            <div className="text-muted small">{m.email}</div>
+                                                                        </div>
+                                                                        {hasAttended && (
+                                                                            <Button variant="success" size="sm" className="d-flex align-items-center gap-2" onClick={() => generateCertificate(m.name, event.title, event.date)}>
+                                                                                <Award size={16}/> Certificate
+                                                                            </Button>
+                                                                        )}
+                                                                    </div>
+                                                                </Col>
+                                                            ))}
+                                                        </Row>
+                                                    </div>
+                                                );
+                                            })()}
+                                        </>
+                                    )}
+
+                                    {event.participationType === 'Individual' && event.attendedStudents?.some(s => s._id === user._id || s === user._id) && (
+                                        <>
+                                            <hr className="my-5 opacity-10"/>
+                                            <div className="d-flex justify-content-between align-items-center flex-wrap gap-3 bg-light bg-opacity-50 p-4 rounded-4 border">
+                                                <div>
+                                                    <h6 className="fw-bold text-dark mb-1">Your Certificate</h6>
+                                                    <p className="text-muted small mb-0">You have successfully attended {event.title}.</p>
+                                                </div>
+                                                <Button variant="success" className="d-flex align-items-center gap-2" onClick={() => generateCertificate(user.name, event.title, event.date)}>
+                                                    <Award size={18}/> Download Certificate
+                                                </Button>
+                                            </div>
+                                        </>
+                                    )}
+
                                 </Card>
                             )}
 

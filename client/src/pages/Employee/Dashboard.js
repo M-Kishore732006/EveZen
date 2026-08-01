@@ -89,12 +89,8 @@ const EmployeeDashboard = () => {
             <Row className="mb-4">
                 {[
                     { label: 'Assigned Events', value: stats.assigned, icon: CalendarCheck, color: 'text-primary', badge: 'bg-primary' },
-                    ...(isStaff ? [
-                        { label: 'Pending Tasks', value: stats.pendingTasks, icon: ClipboardCheck, color: 'text-warning', badge: 'bg-warning' },
-                        { label: 'Completed Tasks', value: stats.completedTasks, icon: Clock, color: 'text-success', badge: 'bg-success' }
-                    ] : [
-                        { label: 'Total Managed Teams', value: stats.assigned * 4, icon: Users, color: 'text-warning', badge: 'bg-warning' }
-                    ])
+                    { label: 'Pending Tasks', value: stats.pendingTasks, icon: ClipboardCheck, color: 'text-warning', badge: 'bg-warning' },
+                    { label: 'Completed Tasks', value: stats.completedTasks, icon: Clock, color: 'text-success', badge: 'bg-success' }
                 ].map((stat, idx) => (
                     <Col lg={4} sm={6} key={idx} className="mb-3">
                         <motion.div variants={itemVariants} className="h-100">
