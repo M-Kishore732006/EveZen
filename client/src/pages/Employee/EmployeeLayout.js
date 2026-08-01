@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutDashboard, CalendarCheck, MessageSquare, ClipboardCheck, User, Menu, Bell, Search, Moon, Sun, ChevronDown, LogOut } from 'lucide-react';
+import { LayoutDashboard, CalendarCheck, MessageSquare, User, Menu, Bell, Search, Moon, Sun, ChevronDown, LogOut } from 'lucide-react';
 import { Dropdown, Badge } from 'react-bootstrap';
 import axios from 'axios';
 
@@ -105,6 +105,7 @@ const EmployeeLayout = ({ role }) => {
                     {navItems.map(item => (
                         <NavLink 
                             key={item.path} to={item.path} end={item.end}
+                            onClick={() => { if (isMobile) setSidebarOpen(false); }}
                             className={({ isActive }) => `d-flex align-items-center gap-3 mb-2 px-3 py-2 ${isActive ? 'active-nav' : 'text-muted'}`}
                             style={({ isActive }) => ({
                                 textDecoration: 'none', borderRadius: '12px',

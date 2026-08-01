@@ -51,7 +51,7 @@ const EmployeeTasks = () => {
             </div>
 
             <Card className="border-0 shadow-sm overflow-hidden flex-grow-1 p-0">
-                <div className="bg-light px-4 py-3 d-flex" style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                <div className="bg-light px-4 py-3 d-none d-md-flex" style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                     <div style={{ flex: '3 1 0' }}>Task Description</div>
                     <div style={{ flex: '1 1 0' }}>Current Status</div>
                     <div style={{ flex: '2 1 0', textAlign: 'right' }}>Action</div>
@@ -59,8 +59,8 @@ const EmployeeTasks = () => {
 
                 <motion.div variants={containerVariants} initial="hidden" animate="show" className="p-2">
                     {tasks.map(task => (
-                        <motion.div variants={itemVariants} key={task.id} className="mx-2 my-2 rounded-4 p-4 d-flex align-items-center bg-white shadow-sm" style={{ border: '1px solid rgba(0,0,0,0.04)' }}>
-                            <div style={{ flex: '3 1 0' }} className="d-flex align-items-center gap-3">
+                        <motion.div variants={itemVariants} key={task.id} className="mx-2 my-2 rounded-4 p-4 d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 bg-white shadow-sm" style={{ border: '1px solid rgba(0,0,0,0.04)' }}>
+                            <div style={{ flex: '3 1 0', width: '100%' }} className="d-flex align-items-center gap-3">
                                 {task.status === 'Completed' ? <CheckCircle2 size={24} className="text-success flex-shrink-0" /> : 
                                  task.status === 'In Progress' ? <ClipboardCheck size={24} className="text-primary flex-shrink-0" /> : 
                                  <Circle size={24} className="text-muted opacity-50 flex-shrink-0" />}
@@ -69,12 +69,12 @@ const EmployeeTasks = () => {
                                     {task.text}
                                 </span>
                             </div>
-                            <div style={{ flex: '1 1 0' }}>
+                            <div style={{ flex: '1 1 0', width: '100%' }}>
                                 <span className={`fw-bold d-flex align-items-center gap-1 ${task.status === 'Completed' ? 'text-success' : task.status === 'In Progress' ? 'text-primary' : 'text-muted'}`}>
                                     {task.status === 'In Progress' && <AlertCircle size={14} className="text-primary"/>}{task.status}
                                 </span>
                             </div>
-                            <div style={{ flex: '2 1 0', textAlign: 'right' }} className="d-flex justify-content-end gap-2">
+                            <div style={{ flex: '2 1 0', width: '100%' }} className="d-flex justify-content-start justify-content-md-end gap-2 mt-2 mt-md-0">
                                 {task.status === 'Pending' && (
                                     <Button variant="outline-primary" className="rounded-pill px-4 fw-medium" onClick={() => toggleTask(task.id, 'start')}>Start Task</Button>
                                 )}

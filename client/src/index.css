@@ -555,6 +555,23 @@ body.dark-theme .modal-footer {
     flex-direction: column !important;
     gap: 10px !important;
   }
+  
+  .fc-toolbar-title {
+    font-size: 1.1rem !important;
+  }
+  
+  .fc-event {
+    padding: 1px 4px !important;
+    font-size: 0.6rem !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .fc .fc-daygrid-day-number {
+    padding: 4px 6px !important;
+    font-size: 0.75rem !important;
+  }
 
   /* Stats Cards stacking natively managed by Bootstrap Col, but ensure gaps */
   .gy-4 {
@@ -566,3 +583,12 @@ body.dark-theme .modal-footer {
     display: none !important;
   }
 }
+
+/* Forum Sidebar Responsiveness */
+@media (min-width: 768px) {
+  .forum-sidebar { width: 280px !important; flex-shrink: 0; }
+}
+@media (max-width: 767px) {
+  .forum-sidebar { width: 100% !important; flex-shrink: 0; }
+}
+

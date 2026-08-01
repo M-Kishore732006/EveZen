@@ -37,7 +37,7 @@ const Signup = () => {
 
     return (
         <Container className="d-flex align-items-center justify-content-center" style={{ minHeight: '100vh', padding: '2rem 0' }}>
-            <Card style={{ width: '450px' }} className="p-4 shadow-sm border-0">
+            <Card style={{ width: '100%', maxWidth: '450px' }} className="p-4 shadow-sm border-0">
                 <div className="text-center mb-4">
                     <h3 style={{ color: 'var(--primary-color)', fontWeight: 700 }}>EveZen</h3>
                     <p className="text-muted">Student Registration</p>

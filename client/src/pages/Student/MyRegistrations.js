@@ -84,8 +84,8 @@ const MyRegistrations = () => {
                     {registrations.map(reg => (
                         <Col md={12} key={reg._id}>
                             <motion.div variants={itemVariants}>
-                                <Card className="border-0 shadow-sm overflow-hidden d-flex flex-row" style={{ minHeight: '140px', transition: 'transform 0.2s' }} onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
-                                    <div style={{ width: '120px', background: 'linear-gradient(45deg, rgba(50, 30, 72, 0.8), rgba(108, 99, 255, 0.8))' }} className="d-flex align-items-center justify-content-center flex-shrink-0 text-white">
+                                <Card className="border-0 shadow-sm overflow-hidden d-flex flex-column flex-md-row" style={{ minHeight: '140px', transition: 'transform 0.2s' }} onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
+                                    <div style={{ minWidth: '120px', background: 'linear-gradient(45deg, rgba(50, 30, 72, 0.8), rgba(108, 99, 255, 0.8))' }} className="d-none d-md-flex align-items-center justify-content-center flex-shrink-0 text-white">
                                         <Calendar size={40} className="opacity-50" />
                                     </div>
                                     <div className="p-4 d-flex flex-grow-1 align-items-center justify-content-between flex-wrap gap-3 bg-white">

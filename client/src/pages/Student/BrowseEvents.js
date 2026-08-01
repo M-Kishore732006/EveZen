@@ -40,7 +40,7 @@ const BrowseEvents = () => {
                     <h3 style={{ fontWeight: 700, color: 'var(--primary-color)' }}>Event Catalog</h3>
                     <p className="text-muted mb-0">Discover and register for upcoming university events.</p>
                 </div>
-                <div className="position-relative" style={{ width: '300px' }}>
+                <div className="position-relative w-100" style={{ maxWidth: '350px' }}>
                     <Search size={18} className="position-absolute text-muted" style={{ left: '16px', top: '50%', transform: 'translateY(-50%)' }} />
                     <input 
                         type="text" 

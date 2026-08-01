@@ -101,6 +101,7 @@ const StudentLayout = () => {
                     {navItems.map(item => (
                         <NavLink 
                             key={item.path} to={item.path} end={item.end}
+                            onClick={() => { if (isMobile) setSidebarOpen(false); }}
                             className={({ isActive }) => `d-flex align-items-center gap-3 mb-2 px-3 py-2 ${isActive ? 'active-nav' : 'text-muted'}`}
                             style={({ isActive }) => ({
                                 textDecoration: 'none', borderRadius: '12px',

@@ -92,7 +92,7 @@ const EmployeeDashboard = () => {
                     { label: 'Pending Tasks', value: stats.pendingTasks, icon: ClipboardCheck, color: 'text-warning', badge: 'bg-warning' },
                     { label: 'Completed Tasks', value: stats.completedTasks, icon: Clock, color: 'text-success', badge: 'bg-success' }
                 ].map((stat, idx) => (
-                    <Col lg={4} sm={6} key={idx} className="mb-3">
+                    <Col xs={12} md={6} lg={4} key={idx} className="mb-3">
                         <motion.div variants={itemVariants} className="h-100">
                             <Card className="p-4 border-0 shadow-sm h-100 d-flex flex-row align-items-center gap-4">
                                 <div className={`p-4 rounded-circle ${stat.badge} bg-opacity-10 ${stat.color} flex-shrink-0 d-flex align-items-center justify-content-center`} style={{ width: '80px', height: '80px' }}>

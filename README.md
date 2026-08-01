@@ -1,70 +1,69 @@
-# Getting Started with Create React App
+# EveZen - Premium Event Management Portal
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+EveZen is a modern, responsive, full-stack web application designed for universities and organizations to seamlessly manage events, ticketing, roles, and automated attendance tracking. Built with a premium SaaS-style interface, EveZen provides dedicated workflows for Administrators, Students, Faculty, and Supporting Staff.
 
-## Available Scripts
+## 🚀 Key Features
 
-In the project directory, you can run:
+### User Roles & Workflows
+*   **Administrator**: Complete global oversight. Manage users, create and schedule events, assign venues, assign staff/faculty, and moderate all discussion forums. View analytical dashboards summarizing registration and attendance data.
 
-### `npm start`
+*   **Student / Participant**: Browse a complete catalog of university events. Register for individual sessions or form teams. Access dynamic QR codes (with time-based expiration) for secure check-ins. Participate in dedicated event discussion forums.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+*   **Faculty Coordinator**: Manage assigned events. Oversee registered students, send official announcements in forums, and monitor event execution.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+*   **Supporting Staff**: Access role-based task checklists (e.g., Tech Support, Logistics, Electrician) automatically generated for assigned events. Use the built-in scanner portal to scan student QR codes and mark attendance.
 
-### `npm test`
+### Technical Highlights
+*   **Dynamic QR Authentication**: Time-based QR codes that refresh automatically and sync with backend OTP logic to prevent screenshot spoofing at entry checkpoints.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+*   **Interactive Forums**: Dedicated discussion spaces scoped to specific events (Announcements, Questions, Resources).
 
-### `npm run build`
+*   **Fully Responsive**: Engineered completely with scalable flex-grids, auto-stacking cards, off-canvas navigation panels, and container bounds that adjust flawlessly from 4K desktops down to 320px mobile screens.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+*   **SaaS Aesthetics**: Utilizes deep modern styling, glassmorphism hints, `framer-motion` micro-interactions, `lucide-react` iconography, and smooth state updates without full page reloads.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 🛠️ Technology Stack
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+*   **Frontend**: React.js, React-Router-DOM, Bootstrap 5, Framer Motion, Axios.
+*   **Backend**: Node.js, Express.js.
+*   **Database**: MongoDB (Mongoose ORM).
+*   **Authentication**: JSON Web Tokens (JWT) & bcrypt.
+*   **Calendar & Utilities**: FullCalendar (DayGrid view), React-Select.
 
-### `npm run eject`
+## ⚙️ Local Development Setup
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+To run this project locally, ensure you have Node.js and MongoDB installed or a MongoDB Atlas URI.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+1. **Clone the repository:**
+   ```bash
+   git clone <repository-url>
+   cd TechNova
+   ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+2. **Configure Environment Variables:**
+   * Create a `.env` file in the `server` directory:
+     ```env
+     PORT=5000
+     MONGO_URI=your_mongodb_connection_string
+     JWT_SECRET=your_jwt_secret_key
+     ```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+3. **Install Dependencies & Start the Backend:**
+   ```bash
+   cd server
+   npm install
+   npm run dev
+   ```
 
-## Learn More
+4. **Install Dependencies & Start the Frontend:**
+   ```bash
+   # Open a new terminal instance
+   cd client
+   npm install
+   npm start
+   ```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+The frontend will boot on `http://localhost:3000` and communicate with the backend on `http://localhost:5000`.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+---
+*Built with ❤️ utilizing the MERN Stack architecture.*

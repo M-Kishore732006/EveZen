@@ -69,9 +69,9 @@ const StudentForums = () => {
                 </div>
             </div>
 
-            <div className="d-flex h-100 gap-4" style={{ minHeight: '600px' }}>
+            <div className="d-flex flex-column flex-md-row h-100 gap-4" style={{ minHeight: '600px' }}>
                 {/* Left Sidebar - Event Selection */}
-                <div style={{ width: '280px' }} className="d-flex flex-column gap-3">
+                <div className="d-flex flex-column gap-3 forum-sidebar">
                     <h6 className="text-muted small fw-bold text-uppercase mb-1">Registered Events</h6>
                     {events.map((ev, idx) => (
                         <div 
@@ -96,7 +96,7 @@ const StudentForums = () => {
                 <Card className="flex-grow-1 border-0 shadow-sm d-flex flex-column overflow-hidden">
                     <div className="p-4 border-bottom bg-light bg-opacity-50">
                         <h5 className="fw-bold mb-3 text-dark">{activeEvent ? activeEvent.title : 'Select an Event'} Forum</h5>
-                        <div className="d-flex p-1" style={{ backgroundColor: 'rgba(0,0,0,0.03)', borderRadius: '12px', width: 'fit-content' }}>
+                        <div className="d-flex p-1 flex-wrap gap-1" style={{ backgroundColor: 'rgba(0,0,0,0.03)', borderRadius: '12px', width: 'fit-content' }}>
                             {['Announcements', 'Questions', 'Resources'].map(tab => (
                                 <button 
                                     key={tab}

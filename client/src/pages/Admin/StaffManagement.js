@@ -145,7 +145,7 @@ const StaffManagement = () => {
             </div>
 
             <Card className="flex-grow-1 p-0 shadow-sm border-0 d-flex flex-column" style={{ overflow: 'hidden' }}>
-                <div className="event-card-bg px-4 py-3 d-flex" style={{ borderBottom: '1px solid var(--border-color, rgba(0,0,0,0.05))', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                <div className="event-card-bg px-4 py-3 d-none d-md-flex" style={{ borderBottom: '1px solid var(--border-color, rgba(0,0,0,0.05))', fontWeight: 600, color: 'var(--text-muted)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                     <div style={{ flex: '2 1 0' }}>Profile</div>
                     <div style={{ flex: '1.5 1 0' }}>Contact</div>
                     {activeTab === 'staff' && <div style={{ flex: '1 1 0' }}>Work Type</div>}
@@ -163,8 +163,8 @@ const StaffManagement = () => {
                     ) : (
                         <motion.div key={activeTab} variants={containerVariants} initial="hidden" animate="show">
                             {activeList.map(item => (
-                                <motion.div variants={itemVariants} key={item._id} className="px-4 py-3 border-bottom d-flex align-items-center" style={{ transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--hover-bg, rgba(0,0,0,0.02))'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
-                                    <div style={{ flex: '2 1 0' }} className="d-flex align-items-center gap-3">
+                                <motion.div variants={itemVariants} key={item._id} className="px-4 py-3 border-bottom d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3" style={{ transition: 'background-color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--hover-bg, rgba(0,0,0,0.02))'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+                                    <div style={{ flex: '2 1 0', width: '100%' }} className="d-flex align-items-center gap-3">
                                         <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'rgba(108, 99, 255, 0.1)', color: 'var(--accent-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
                                             {item.name.charAt(0)}
                                         </div>
@@ -173,7 +173,7 @@ const StaffManagement = () => {
                                             <div className="text-muted" style={{ fontSize: '0.8rem' }}>ID: {item._id.substring(item._id.length - 6).toUpperCase()}</div>
                                         </div>
                                     </div>
-                                    <div style={{ flex: '1.5 1 0' }}>
+                                    <div style={{ flex: '1.5 1 0', width: '100%' }}>
                                         <div className="d-flex align-items-center gap-2 text-dark" style={{ fontSize: '0.85rem' }}>
                                             <Mail size={14} className="text-muted" /> {item.email}
                                         </div>
@@ -182,11 +182,11 @@ const StaffManagement = () => {
                                         </div>
                                     </div>
                                     {activeTab === 'staff' && (
-                                        <div style={{ flex: '1 1 0' }}>
+                                        <div style={{ flex: '1 1 0', width: '100%' }}>
                                             <Badge bg="light" text="dark" style={{ border: '1px solid rgba(0,0,0,0.1)' }}>{item.workType}</Badge>
                                         </div>
                                     )}
-                                    <div style={{ flex: '1 1 0' }}>
+                                    <div style={{ flex: '1 1 0', width: '100%' }}>
                                         <div className="d-flex align-items-center gap-2">
                                             <CalendarIcon size={14} className="text-muted" /> 
                                             <span style={{ fontSize: '0.9rem', fontWeight: 500, color: 'var(--primary-color)' }}>
@@ -194,7 +194,7 @@ const StaffManagement = () => {
                                             </span>
                                         </div>
                                     </div>
-                                    <div style={{ flex: '0.5 1 0', textAlign: 'right' }} className="d-flex justify-content-end gap-2">
+                                    <div style={{ flex: '0.5 1 0', width: '100%' }} className="d-flex justify-content-start justify-content-md-end gap-2 mt-2 mt-md-0">
                                         <button className="btn btn-light btn-sm rounded-circle p-2 d-flex" onClick={() => handleEdit(item)}><Edit size={16} className="text-primary" /></button>
                                         <button className="btn btn-light btn-sm rounded-circle p-2 d-flex" onClick={() => handleDelete(item._id, activeTab === 'faculty')}><Trash size={16} className="text-danger" /></button>
                                     </div>

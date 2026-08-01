@@ -241,11 +241,11 @@ const EventDetails = () => {
             </Button>
             
             <div className="mb-4">
-                <div className="d-flex align-items-center gap-3 mb-2">
+                <div className="d-flex align-items-center gap-3 mb-2 flex-wrap">
                     <h2 className="fw-bold text-dark mb-0">{event.title}</h2>
                     <Badge bg={event.participationType === 'Team' ? 'info' : 'secondary'} className="px-3 py-2">{event.participationType} Event</Badge>
                 </div>
-                <div className="d-flex gap-4 text-muted">
+                <div className="d-flex gap-4 text-muted flex-wrap">
                     <span className="d-flex align-items-center gap-1"><Calendar size={16}/> {new Date(event.date).toLocaleDateString()}</span>
                     <span className="d-flex align-items-center gap-1"><MapPin size={16}/> {event.venue?.name || 'TBA'}</span>
                 </div>

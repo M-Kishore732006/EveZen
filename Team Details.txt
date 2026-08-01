@@ -1,0 +1,23 @@
+EVEZEN – Event Management Portal (QR Based)
+
+Hackathon Project Report
+
+Submitted By
+
+Team Name: STACK TITANS
+
+Team Members:
+
+1. Pradeep S  (7376232AD212)
+2. Kishore M  (7376232AD182)
+3. Mouneesh D (7376232AD197)
+
+Technology Stack (MERN)
+
+* Frontend: React.js
+* Backend: Node.js & Express.js
+* Database: MongoDB
+* Authentication: JWT
+
+
+

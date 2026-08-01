@@ -100,7 +100,7 @@ const Dashboard = () => {
                     { label: 'Completed Events', value: stats.completed, icon: CheckCircle, color: 'glass-icon-success' },
                     { label: 'Forum Updates', value: stats.pendingForums, icon: Bell, color: 'glass-icon-danger' }
                 ].map((stat, idx) => (
-                    <Col lg={3} sm={6} key={idx} className="mb-3">
+                    <Col xs={12} md={6} lg={3} key={idx} className="mb-3">
                         <motion.div variants={itemVariants}>
                             <Card className="p-4 h-100 border-0 shadow-sm">
                                 <div className="d-flex justify-content-between align-items-start mb-3">
