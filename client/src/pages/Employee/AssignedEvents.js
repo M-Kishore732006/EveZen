@@ -1,21 +1,27 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import axios from 'axios';
-import { Card, Row, Col, Badge, Button } from 'react-bootstrap';
-import { Calendar, MapPin, Users, Clock, Search, ExternalLink, Activity } from 'lucide-react';
+import { Card, Row, Col, Badge, Button, Modal } from 'react-bootstrap';
+import { Calendar, MapPin, Users, Clock, Search, ExternalLink, Activity, QrCode } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { Html5QrcodeScanner } from 'html5-qrcode';
 
 const AssignedEvents = () => {
     const { user } = useContext(AuthContext);
     const navigate = useNavigate();
     const [events, setEvents] = useState([]);
     const [search, setSearch] = useState('');
+    const [showScanner, setShowScanner] = useState(false);
+    const [scanningEventId, setScanningEventId] = useState(null);
+    const [scanResult, setScanResult] = useState({ type: '', message: '' });
+    const [otpInput, setOtpInput] = useState('');
     const isStaff = user?.role === 'Supporting Staff';
     const basePath = isStaff ? '/staff' : '/faculty';
 
     useEffect(() => {
         if (user?.token) fetchAssignedEvents();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user]);
 
     const fetchAssignedEvents = async () => {
@@ -33,6 +39,54 @@ const AssignedEvents = () => {
     const itemVariants = { hidden: { opacity: 0, y: 15 }, show: { opacity: 1, y: 0 } };
 
     const filteredEvents = events.filter(e => e.title.toLowerCase().includes(search.toLowerCase()));
+
+    useEffect(() => {
+        let scanner;
+        if (showScanner) {
+            scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: { width: 250, height: 250 } }, false);
+            scanner.render(async (decodedText) => {
+                scanner.pause(true);
+                try {
+                    const res = await axios.post(`http://localhost:5000/api/events/${scanningEventId}/attendance`, 
+                        { qrData: decodedText }, 
+                        { headers: { Authorization: `Bearer ${user.token}` } }
+                    );
+                    setScanResult({ type: 'success', message: res.data.message });
+                } catch (err) {
+                    setScanResult({ type: 'danger', message: err.response?.data?.message || 'Verification failed.' });
+                }
+                setTimeout(() => {
+                    setScanResult({ type: '', message: '' });
+                    scanner.resume();
+                }, 3000);
+            }, undefined);
+        }
+        return () => {
+            if (scanner) scanner.clear().catch(error => console.error('Failed to clear scanner', error));
+        };
+    }, [showScanner, scanningEventId, user]);
+
+    const handleOpenScanner = (eventId) => {
+        setScanningEventId(eventId);
+        setScanResult({ type: '', message: '' });
+        setOtpInput('');
+        setShowScanner(true);
+    };
+
+    const handleOtpSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const res = await axios.post(`http://localhost:5000/api/events/${scanningEventId}/attendance-otp`, 
+                { otp: otpInput }, 
+                { headers: { Authorization: `Bearer ${user.token}` } }
+            );
+            setScanResult({ type: 'success', message: res.data.message });
+            setOtpInput('');
+        } catch (err) {
+            setScanResult({ type: 'danger', message: err.response?.data?.message || 'OTP Verification failed.' });
+        }
+        setTimeout(() => setScanResult({ type: '', message: '' }), 3000);
+    };
 
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="h-100 d-flex flex-column">
@@ -75,8 +129,8 @@ const AssignedEvents = () => {
                                             
                                             <div className="mt-auto d-flex gap-2 flex-wrap">
                                                 {!isStaff && (
-                                                    <Button variant="outline-primary" className="flex-grow-1 rounded-pill d-flex align-items-center justify-content-center fw-medium" onClick={() => alert('Attendance Module opens here')}>
-                                                        <Activity size={16} className="me-2"/> Attendance
+                                                    <Button variant="outline-primary" className="flex-grow-1 rounded-pill d-flex align-items-center justify-content-center fw-medium" onClick={() => handleOpenScanner(ev._id)}>
+                                                        <QrCode size={16} className="me-2"/> Attendance
                                                     </Button>
                                                 )}
                                                 {isStaff && (
@@ -103,6 +157,32 @@ const AssignedEvents = () => {
                     )}
                 </motion.div>
             </div>
+            <Modal show={showScanner} onHide={() => { setShowScanner(false); setScanningEventId(null); }} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title className="fw-bold text-primary">Scan QR Code</Modal.Title>
+                </Modal.Header>
+                <Modal.Body className="text-center pb-4">
+                    <p className="text-muted mb-3">Position the student's QR code within the frame.</p>
+                    {scanResult.message && <div className={`alert alert-${scanResult.type} py-2 mb-3 fw-medium`}>{scanResult.message}</div>}
+                    <div id="reader" style={{ width: '100%', borderRadius: '12px', overflow: 'hidden' }}></div>
+                    
+                    <div className="mt-4 pt-4 border-top">
+                        <p className="text-muted mb-3 fw-medium">Or enter the 6-digit passcode manually:</p>
+                        <form onSubmit={handleOtpSubmit} className="d-flex align-items-center gap-2 justify-content-center">
+                            <input 
+                                type="text"
+                                className="form-control text-center fw-bold"
+                                style={{ maxWidth: '200px', fontSize: '1.25rem', letterSpacing: '4px' }}
+                                placeholder="123456"
+                                maxLength={6}
+                                value={otpInput}
+                                onChange={e => setOtpInput(e.target.value)}
+                            />
+                            <Button type="submit" variant="primary" disabled={otpInput.length !== 6}>Verify</Button>
+                        </form>
+                    </div>
+                </Modal.Body>
+            </Modal>
         </motion.div>
     );
 };

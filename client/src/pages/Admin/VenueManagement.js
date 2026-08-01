@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import axios from 'axios';
-import { Card, Button, Modal, Form, Alert, Badge } from 'react-bootstrap';
-import { Edit, Trash, Plus, MapPin, Users, Hash, Info } from 'lucide-react';
+import { Card, Button, Modal, Form, Badge } from 'react-bootstrap';
+import { Edit, Trash, Plus, MapPin, Users, Info } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const VenueManagement = () => {
@@ -24,6 +24,7 @@ const VenueManagement = () => {
         if (user?.token) {
             fetchVenues();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user]);
 
     const fetchVenues = async () => {

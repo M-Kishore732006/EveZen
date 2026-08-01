@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutDashboard, Compass, Ticket, QrCode, MessageSquare, User, Menu, Bell, Search, Moon, Sun, ChevronDown, LogOut } from 'lucide-react';
+import { LayoutDashboard, Compass, Ticket, MessageSquare, User, Menu, Bell, Search, Moon, Sun, ChevronDown, LogOut } from 'lucide-react';
 import { Dropdown, Badge } from 'react-bootstrap';
 import axios from 'axios';
 
@@ -10,7 +10,8 @@ const StudentLayout = () => {
     const { user, logout } = useContext(AuthContext);
     const navigate = useNavigate();
     const location = useLocation();
-    const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const [theme, setTheme] = useState(localStorage.getItem('evezen_theme') || 'light');
     const [notifications, setNotifications] = useState([]);
 
@@ -33,6 +34,16 @@ const StudentLayout = () => {
         localStorage.setItem('evezen_theme', theme);
     }, [theme]);
 
+    useEffect(() => {
+        const handleResize = () => {
+            const mobile = window.innerWidth <= 768;
+            setIsMobile(mobile);
+            setSidebarOpen(!mobile);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     const toggleTheme = () => {
         setTheme(theme === 'light' ? 'dark' : 'light');
     };
@@ -40,6 +51,16 @@ const StudentLayout = () => {
     const handleLogout = () => {
         logout();
         navigate('/login');
+    };
+
+    const handleMarkAsRead = async () => {
+        if (!user?.token) return;
+        try {
+            await axios.post('http://localhost:5000/api/notifications/mark-read', {}, {
+                headers: { Authorization: `Bearer ${user.token}` }
+            });
+            setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+        } catch (error) { console.error(error); }
     };
 
     if (!user || user.role !== 'Student') {
@@ -63,11 +84,12 @@ const StudentLayout = () => {
 
     return (
         <div style={{ backgroundColor: 'var(--bg-color)', minHeight: '100vh', display: 'flex', overflow: 'hidden' }}>
+            {isMobile && sidebarOpen && <div className="mobile-overlay" onClick={() => setSidebarOpen(false)}></div>}
             <motion.div 
                 initial={false}
-                animate={{ width: sidebarOpen ? '260px' : '80px' }}
-                style={{ backgroundColor: 'var(--card-bg)', borderRight: '1px solid var(--border-color, rgba(0,0,0,0.04))', display: 'flex', flexDirection: 'column', zIndex: 10 }}
-                className="shadow-sm sidebar-panel"
+                animate={{ width: sidebarOpen ? '260px' : (isMobile ? '0px' : '80px') }}
+                style={{ backgroundColor: 'var(--card-bg)', borderRight: '1px solid var(--border-color, rgba(0,0,0,0.04))', display: 'flex', flexDirection: 'column', zIndex: 1050, overflow: 'hidden' }}
+                className={`shadow-sm sidebar-panel ${!sidebarOpen && isMobile ? 'd-none' : ''}`}
             >
                 <div className="p-4 d-flex align-items-center gap-3">
                     <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: 'var(--accent-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 'bold' }}>EZ</div>
@@ -96,17 +118,22 @@ const StudentLayout = () => {
             </motion.div>
 
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
-                <header className="px-5 py-3 d-flex justify-content-between align-items-center bg-white" style={{ borderBottom: '1px solid var(--border-color, rgba(0,0,0,0.04))' }}>
-                    <div className="d-flex align-items-center gap-4 w-50">
-                        <button onClick={() => setSidebarOpen(!sidebarOpen)} className="btn btn-light p-2 rounded-circle d-flex align-items-center justify-content-center" style={{ width: '40px', height: '40px' }}>
+                <header className="px-3 px-md-5 py-3 d-flex justify-content-between align-items-center bg-white flex-wrap gap-3" style={{ borderBottom: '1px solid var(--border-color, rgba(0,0,0,0.04))' }}>
+                    <div className="d-flex align-items-center gap-2 gap-md-4" style={{ flex: isMobile ? '1' : '0 0 50%' }}>
+                        <button onClick={() => setSidebarOpen(!sidebarOpen)} className="btn btn-light p-2 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style={{ width: '40px', height: '40px' }}>
                             <Menu size={20} className="text-muted" />
                         </button>
-                        <div className="position-relative w-100" style={{ maxWidth: '400px' }}>
+                        <div className={`position-relative ${isMobile ? 'd-none' : 'w-100'}`} style={{ maxWidth: '400px' }}>
                             <Search size={18} className="position-absolute text-muted" style={{ left: '16px', top: '50%', transform: 'translateY(-50%)' }} />
                             <input type="text" className="form-control" placeholder="Search events, forums..." style={{ paddingLeft: '44px', borderRadius: '20px', backgroundColor: 'var(--bg-color)', border: 'none' }} />
                         </div>
                     </div>
-                    <div className="d-flex align-items-center gap-4">
+                    <div className="d-flex align-items-center gap-2 gap-md-4">
+                        {isMobile && (
+                            <button className="btn btn-light p-2 rounded-circle d-flex align-items-center justify-content-center" style={{ width: '40px', height: '40px' }}>
+                                <Search size={20} className="text-muted" />
+                            </button>
+                        )}
                         <button onClick={toggleTheme} className="btn btn-light p-2 rounded-circle d-flex align-items-center justify-content-center" style={{ width: '40px', height: '40px' }}>
                              {theme === 'dark' ? <Sun size={20} className="text-muted" /> : <Moon size={20} className="text-muted" />}
                         </button>
@@ -114,13 +141,13 @@ const StudentLayout = () => {
                             <Dropdown.Toggle as="button" className="btn btn-light p-0 rounded-circle d-flex align-items-center justify-content-center position-relative border-0" style={{ width: '40px', height: '40px', background: 'transparent' }} id="dropdown-notifications">
                                 <div className="btn btn-light p-2 rounded-circle d-flex align-items-center justify-content-center w-100 h-100">
                                     <Bell size={20} className="text-muted" />
-                                    {notifications.length > 0 && <span className="position-absolute p-1 bg-danger border border-light rounded-circle" style={{ top: '8px', right: '4px' }}></span>}
+                                    {notifications.filter(n => !n.read).length > 0 && <span className="position-absolute p-1 bg-danger border border-light rounded-circle" style={{ top: '8px', right: '4px' }}></span>}
                                 </div>
                             </Dropdown.Toggle>
                             <Dropdown.Menu className="shadow border-0 rounded-3 mt-3 p-0" style={{ minWidth: '320px', overflow: 'hidden' }}>
                                 <div className="p-3 bg-light border-bottom d-flex justify-content-between align-items-center">
-                                    <h6 className="mb-0 fw-bold">Notifications</h6>
-                                    <Badge bg="primary" pill>{notifications.length} New</Badge>
+                                    <h6 className="mb-0 fw-bold text-dark">Notifications</h6>
+                                    <Badge bg="primary" pill>{notifications.filter(n => !n.read).length} New</Badge>
                                 </div>
                                 <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
                                     {notifications.length === 0 ? (
@@ -141,19 +168,19 @@ const StudentLayout = () => {
                                     )}
                                 </div>
                                 <div className="p-2 text-center bg-light border-top">
-                                    <small className="text-primary fw-medium" style={{ cursor: 'pointer' }}>Mark all as read</small>
+                                    <small className="text-primary fw-medium" style={{ cursor: 'pointer' }} onClick={handleMarkAsRead}>Mark all as read</small>
                                 </div>
                             </Dropdown.Menu>
                         </Dropdown>
                         <div style={{ width: '1px', height: '24px', backgroundColor: 'rgba(0,0,0,0.1)' }}></div>
                         <Dropdown align="end">
-                            <Dropdown.Toggle variant="link" className="text-decoration-none d-flex align-items-center gap-3 p-0 border-0 text-dark" id="dropdown-user">
-                                <div className="text-end d-none d-md-block">
+                            <Dropdown.Toggle variant="link" className="text-decoration-none d-flex align-items-center gap-2 gap-md-3 p-0 border-0 text-dark" id="dropdown-user">
+                                <div className="text-end d-none d-md-block user-info-text">
                                     <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>{user.name}</div>
                                     <div className="text-muted" style={{ fontSize: '0.75rem' }}>Student</div>
                                 </div>
                                 <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--accent-color)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>{user.name.charAt(0).toUpperCase()}</div>
-                                <ChevronDown size={16} className="text-muted" />
+                                {!isMobile && <ChevronDown size={16} className="text-muted" />}
                             </Dropdown.Toggle>
                             <Dropdown.Menu className="shadow border-0 rounded-3 mt-3" style={{ minWidth: '200px' }}>
                                 <Dropdown.Item className="d-flex align-items-center gap-2 py-2" onClick={() => navigate('/student/profile')}><User size={16}/> Profile</Dropdown.Item>

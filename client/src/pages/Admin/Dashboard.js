@@ -3,8 +3,8 @@ import { AuthContext } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Row, Col, Card, Modal, Button } from 'react-bootstrap';
-import { Calendar as CalendarIcon, Clock, MapPin, Users, NotebookText, TrendingUp, Plus, ChevronLeft, ChevronRight, Search } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Calendar as CalendarIcon, Clock, MapPin, Users, NotebookText, Plus, ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 // FullCalendar Imports
 import FullCalendar from '@fullcalendar/react';
@@ -28,6 +28,7 @@ const Dashboard = () => {
             fetchStats();
             fetchEvents();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user]);
 
     const fetchStats = async () => {

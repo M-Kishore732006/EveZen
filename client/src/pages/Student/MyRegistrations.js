@@ -14,10 +14,12 @@ const MyRegistrations = () => {
     const [showQR, setShowQR] = useState(false);
     const [selectedEventId, setSelectedEventId] = useState(null);
     const [qrCodeData, setQrCodeData] = useState('');
+    const [otpData, setOtpData] = useState('');
     const [timeLeft, setTimeLeft] = useState(60);
 
     useEffect(() => {
         if (user?.token) fetchRegistrations();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user]);
 
     const fetchRegistrations = async () => {
@@ -33,13 +35,20 @@ const MyRegistrations = () => {
         let timer;
         let qrInterval;
         if (showQR && selectedEventId) {
-            const generateQR = () => {
+            const generateQRAndOTP = async () => {
                 const timestamp = new Date().getTime();
                 setQrCodeData(`EVENT:${selectedEventId}|USER:${user._id}|TS:${timestamp}`);
                 setTimeLeft(60);
+                
+                try {
+                    const res = await axios.post(`http://localhost:5000/api/events/${selectedEventId}/generate-pass`, {}, {
+                        headers: { Authorization: `Bearer ${user.token}` }
+                    });
+                    setOtpData(res.data.otp);
+                } catch (error) { console.error('Failed to generate OTP', error); }
             };
             
-            generateQR(); // Initial gen
+            generateQRAndOTP(); // Initial gen
             
             timer = setInterval(() => {
                 setTimeLeft(prev => {
@@ -48,7 +57,7 @@ const MyRegistrations = () => {
                 });
             }, 1000);
 
-            qrInterval = setInterval(generateQR, 60000);
+            qrInterval = setInterval(generateQRAndOTP, 60000);
         }
         return () => { clearInterval(timer); clearInterval(qrInterval); };
     }, [showQR, selectedEventId, user]);
@@ -83,7 +92,11 @@ const MyRegistrations = () => {
                                         <div>
                                             <div className="d-flex align-items-center gap-3 mb-1">
                                                 <h5 className="fw-bold mb-0 text-dark">{reg.title}</h5>
-                                                <Badge bg="success" text="white" className="border bg-opacity-75">Confirmed</Badge>
+                                                {reg.attendedStudents?.some(s => s._id === user._id) ? (
+                                                    <Badge bg="primary" text="white" className="border bg-opacity-75">Attended</Badge>
+                                                ) : (
+                                                    <Badge bg="success" text="white" className="border bg-opacity-75">Confirmed</Badge>
+                                                )}
                                             </div>
                                             <p className="text-muted small fw-medium mb-2 opacity-75">Participation: {reg.participationType}</p>
                                             <div className="d-flex align-items-center gap-3 text-muted" style={{ fontSize: '0.85rem' }}>
@@ -96,9 +109,11 @@ const MyRegistrations = () => {
                                             <Button variant="light" className="rounded-pill d-flex align-items-center px-4 border shadow-sm" onClick={() => navigate(`/student/events/${reg._id}`)}>
                                                 <Eye size={16} className="me-2 text-muted"/> View Details
                                             </Button>
-                                            <Button variant="primary" className="rounded-pill d-flex align-items-center px-4 shadow-sm" onClick={() => openQR(reg._id)}>
-                                                <QrCode size={16} className="me-2"/> Authentication QR
-                                            </Button>
+                                            {!reg.attendedStudents?.some(s => s._id === user._id) && (
+                                                <Button variant="primary" className="rounded-pill d-flex align-items-center px-4 shadow-sm" onClick={() => openQR(reg._id)}>
+                                                    <QrCode size={16} className="me-2"/> Authentication QR
+                                                </Button>
+                                            )}
                                         </div>
                                     </div>
                                 </Card>
@@ -123,8 +138,14 @@ const MyRegistrations = () => {
                 <Modal.Body className="d-flex flex-column align-items-center pb-5 pt-3">
                     <p className="text-muted text-center mb-4">Present this secure QR code at the registration desk. It refreshes automatically.</p>
                     
-                    <div className="p-3 bg-white rounded-4 shadow-sm border mb-4" style={{ display: 'inline-block' }}>
+                    <div className="p-3 bg-white rounded-4 shadow-sm border mb-4 text-center" style={{ display: 'inline-block' }}>
                         {qrCodeData && <QRCodeSVG value={qrCodeData} size={220} level="H" fgColor="var(--primary-color)" />}
+                        {otpData && (
+                            <div className="mt-3 pt-3 border-top">
+                                <div className="text-muted small fw-bold text-uppercase mb-1">Or use Passcode</div>
+                                <div style={{ fontSize: '2rem', letterSpacing: '8px', color: 'var(--accent-color)' }} className="fw-bold">{otpData}</div>
+                            </div>
+                        )}
                     </div>
 
                     <div className="d-flex align-items-center gap-2 text-primary fw-medium px-4 py-2 rounded-pill" style={{ backgroundColor: 'rgba(108, 99, 255, 0.1)' }}>

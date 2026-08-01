@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import axios from 'axios';
-import { Card, Button, Modal, Form, Alert, Badge } from 'react-bootstrap';
-import { Edit, Trash, Plus, Calendar, Clock, MapPin, Users, Info } from 'lucide-react';
+import { Card, Button, Modal, Form, Badge } from 'react-bootstrap';
+import { Edit, Trash, Plus, Calendar, Clock, MapPin, Info } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Select from 'react-select';
 
@@ -25,6 +25,7 @@ const EventManagement = () => {
             fetchEvents();
             fetchLookups();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user]);
 
     const fetchEvents = async () => {

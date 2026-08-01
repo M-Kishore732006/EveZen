@@ -301,9 +301,46 @@ body.dark-theme .text-dark {
   color: #F8FAFC !important;
 }
 
-body.dark-theme header.bg-white {
-  background-color: #1E293B !important;
+body.dark-theme header.bg-white, body.dark-theme .bg-white {
+  background-color: var(--card-bg) !important;
+  color: var(--text-dark) !important;
   border-bottom-color: rgba(255,255,255,0.05) !important;
+}
+
+/* React Select Dark Theme Overrides */
+body.dark-theme .css-13cymwt-control,
+body.dark-theme .css-t3ipsp-control {
+  background-color: var(--bg-color) !important;
+  border-color: rgba(255,255,255,0.1) !important;
+  color: var(--text-dark) !important;
+}
+body.dark-theme .css-1jqq78o-placeholder {
+  color: var(--text-muted) !important;
+}
+body.dark-theme .css-1dimb5e-singleValue,
+body.dark-theme .css-1u9des2-indicatorSeparator {
+  color: var(--text-dark) !important;
+  background-color: rgba(255,255,255,0.1) !important;
+}
+body.dark-theme .css-1nmdiq5-menu {
+  background-color: var(--card-bg) !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+}
+body.dark-theme .css-d7l1ni-option {
+  background-color: var(--nav-active-bg) !important;
+}
+body.dark-theme .css-tr4s17-option {
+  color: var(--text-dark) !important;
+}
+body.dark-theme [class*="-control"] {
+  background-color: var(--bg-color);
+  border-color: rgba(255,255,255,0.1);
+}
+body.dark-theme [class*="-menu"] {
+  background-color: var(--card-bg);
+}
+body.dark-theme [class*="-singleValue"], body.dark-theme [class*="-multiValue"] {
+  color: var(--text-dark);
 }
 
 body.dark-theme .dropdown-menu {
@@ -471,4 +508,57 @@ body.dark-theme .modal-header,
 body.dark-theme .modal-footer {
   background-color: var(--card-bg) !important;
   border-color: rgba(255,255,255,0.05) !important;
+}
+
+/* Mobile Responsiveness Overrides */
+@media (max-width: 768px) {
+  .sidebar-panel {
+    position: fixed !important;
+    height: 100vh !important;
+    left: 0;
+    top: 0;
+    transform: translateX(0);
+    z-index: 1050; /* Above topbar and other content */
+    box-shadow: 4px 0 24px rgba(0,0,0,0.1);
+  }
+  
+  .mobile-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 1040;
+  }
+
+  /* Padding adjustments for layout main area */
+  main {
+    padding: 1rem !important;
+  }
+
+  header {
+    padding: 1rem !important;
+  }
+
+  /* Modals */
+  .premium-modal .modal-dialog {
+    margin: 1rem;
+  }
+
+  /* FC header buttons wrapping */
+  .fc-toolbar {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+
+  /* Stats Cards stacking natively managed by Bootstrap Col, but ensure gaps */
+  .gy-4 {
+    --bs-gutter-y: 1rem !important;
+  }
+
+  /* Hiding user text on small display */
+  .user-info-text {
+    display: none !important;
+  }
 }

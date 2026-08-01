@@ -26,6 +26,7 @@ const EventDetails = () => {
 
     useEffect(() => {
         if (user?.token) fetchEvent();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user, id]);
 
     const fetchEvent = async () => {

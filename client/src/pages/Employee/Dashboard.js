@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState, useRef } from 'react';
 import { AuthContext } from '../../context/AuthContext';
-import { Card, Row, Col, Button, Badge } from 'react-bootstrap';
-import { ClipboardCheck, CalendarCheck, Clock, Users, MapPin, ArrowRight, ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import { Card, Row, Col, Button } from 'react-bootstrap';
+import { ClipboardCheck, CalendarCheck, Clock, Users, ArrowRight, ChevronLeft, ChevronRight, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import axios from 'axios';
@@ -25,6 +25,7 @@ const EmployeeDashboard = () => {
 
     useEffect(() => {
         if (user?.token) fetchEvents();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user]);
 
     const fetchEvents = async () => {

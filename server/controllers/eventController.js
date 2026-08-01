@@ -1,6 +1,7 @@
 const Event = require('../models/Event');
 const User = require('../models/User');
 const Notification = require('../models/Notification');
+const AttendancePass = require('../models/AttendancePass');
 
 const checkConflicts = async (date, startTime, endTime, venueId, facultyIds, staffIds, eventId = null) => {
     const query = { date: new Date(date) };
@@ -27,7 +28,8 @@ const getEvents = async (req, res) => {
             .populate('venue', 'name location')
             .populate('assignedFaculty', 'name')
             .populate('assignedStaff', 'name workType')
-            .populate('registeredStudents', 'name email');
+            .populate('registeredStudents', 'name email')
+            .populate('attendedStudents', 'name email');
         res.json(events);
     } catch (error) { res.status(500).json({ message: error.message }); }
 };
@@ -107,4 +109,98 @@ const registerForEvent = async (req, res) => {
     } catch (error) { res.status(500).json({ message: error.message }); }
 };
 
-module.exports = { getEvents, createEvent, updateEvent, deleteEvent, getDashboardStats, registerForEvent };
+const markAttendance = async (req, res) => {
+    try {
+        const { qrData } = req.body;
+        const eventId = req.params.id;
+
+        // qrData format: EVENT:eventId|USER:userId|TS:timestamp
+        if (!qrData || !qrData.startsWith('EVENT:')) {
+            return res.status(400).json({ message: 'Invalid QR code.' });
+        }
+
+        const parts = qrData.split('|');
+        const extractedEventId = parts[0].split(':')[1];
+        const extractedUserId = parts[1].split(':')[1];
+        const timestamp = parseInt(parts[2].split(':')[1]);
+
+        if (extractedEventId !== eventId) {
+            return res.status(400).json({ message: 'QR code does not match this event.' });
+        }
+
+        const now = new Date().getTime();
+        if (now - timestamp > 5 * 60 * 1000) { // 5 minutes validity
+            return res.status(400).json({ message: 'QR code expired. Please refresh the QR code.' });
+        }
+
+        const event = await Event.findById(eventId);
+        if (!event) return res.status(404).json({ message: 'Event not found.' });
+
+        if (!event.registeredStudents.some(id => id.toString() === extractedUserId.toString())) {
+            return res.status(400).json({ message: 'Student is not registered for this event.' });
+        }
+
+        if (event.attendedStudents.some(id => id.toString() === extractedUserId.toString())) {
+            return res.status(400).json({ message: 'Attendance already marked for this student.' });
+        }
+
+        event.attendedStudents.push(extractedUserId);
+        await event.save();
+
+        res.json({ message: 'Attendance marked successfully.' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const generateOtp = async (req, res) => {
+    try {
+        const eventId = req.params.id;
+        const userId = req.user._id;
+
+        const event = await Event.findById(eventId);
+        if (!event) return res.status(404).json({ message: 'Event not found.' });
+
+        if (!event.registeredStudents.some(id => id.toString() === userId.toString())) {
+            return res.status(400).json({ message: 'Not registered for this event.' });
+        }
+
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        
+        await AttendancePass.deleteMany({ eventId, userId }); // Clear old OTPs
+        
+        await AttendancePass.create({ eventId, userId, otp });
+        
+        res.json({ otp });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const markAttendanceOtp = async (req, res) => {
+    try {
+        const eventId = req.params.id;
+        const { otp } = req.body;
+
+        const pass = await AttendancePass.findOne({ eventId, otp });
+        if (!pass) return res.status(400).json({ message: 'Invalid or expired OTP.' });
+
+        const event = await Event.findById(eventId);
+        if (!event) return res.status(404).json({ message: 'Event not found.' });
+
+        if (event.attendedStudents.some(id => id.toString() === pass.userId.toString())) {
+            await AttendancePass.findByIdAndDelete(pass._id);
+            return res.status(400).json({ message: 'Attendance already marked for this student.' });
+        }
+
+        event.attendedStudents.push(pass.userId);
+        await event.save();
+        await AttendancePass.findByIdAndDelete(pass._id);
+
+        res.json({ message: 'Attendance marked successfully.' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+module.exports = { getEvents, createEvent, updateEvent, deleteEvent, getDashboardStats, registerForEvent, markAttendance, generateOtp, markAttendanceOtp };

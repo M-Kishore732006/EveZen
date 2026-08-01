@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import axios from 'axios';
 import { Card, Button, Row, Col, Badge } from 'react-bootstrap';
-import { Calendar, MapPin, Users, Clock, Search, ArrowRight, CheckCircle } from 'lucide-react';
+import { Calendar, MapPin, Clock, Search, ArrowRight, CheckCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
@@ -14,6 +14,7 @@ const BrowseEvents = () => {
 
     useEffect(() => {
         if (user?.token) fetchEvents();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user]);
 
     const fetchEvents = async () => {
@@ -25,7 +26,7 @@ const BrowseEvents = () => {
 
     const handleRegister = async (eventId) => {
         try {
-            const res = await axios.post(`http://localhost:5000/api/events/${eventId}/register`, {}, { headers: { Authorization: `Bearer ${user.token}` } });
+            await axios.post(`http://localhost:5000/api/events/${eventId}/register`, {}, { headers: { Authorization: `Bearer ${user.token}` } });
             alert('Successfully registered!');
             fetchEvents(); // Refresh to get updated lists
         } catch (error) {

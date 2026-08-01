@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
-import { Card, Button, Form, ProgressBar } from 'react-bootstrap';
+import { Card, Button, ProgressBar } from 'react-bootstrap';
 import { ClipboardCheck, CheckCircle2, Circle, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 

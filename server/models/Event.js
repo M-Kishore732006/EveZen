@@ -12,7 +12,8 @@ const eventSchema = new mongoose.Schema({
     venue: { type: mongoose.Schema.Types.ObjectId, ref: 'Venue', required: true },
     assignedFaculty: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     assignedStaff: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-    registeredStudents: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
+    registeredStudents: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    attendedStudents: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 }, { timestamps: true });
 
 module.exports = mongoose.model('Event', eventSchema);

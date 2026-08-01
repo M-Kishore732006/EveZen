@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Badge } from 'react-bootstrap';
-import { QrCode, ShieldAlert, RefreshCw, Ticket } from 'lucide-react';
+import { Card, Button } from 'react-bootstrap';
+import { ShieldAlert, RefreshCw, Ticket } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const MyQR = () => {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Card, Button, Form, InputGroup, Badge } from 'react-bootstrap';
-import { pin, FileText, Pin, MessageSquare, Send } from 'lucide-react';
+import { FileText, Pin, Send } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AuthContext } from '../../context/AuthContext';
 import axios from 'axios';
@@ -14,6 +14,7 @@ const StudentForums = () => {
 
     useEffect(() => {
         if (user?.token) fetchEvents();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user]);
 
     const fetchEvents = async () => {

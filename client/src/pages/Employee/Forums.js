@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { Card, Button, Form, InputGroup, Badge } from 'react-bootstrap';
-import { Search, Send, FileText, Pin, MessageSquare, Plus, Paperclip } from 'lucide-react';
+import { Send, FileText, Pin, Plus, Paperclip } from 'lucide-react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 
@@ -17,6 +17,7 @@ const EmployeeForums = () => {
 
     useEffect(() => {
         if (user?.token) fetchEvents();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user]);
 
     const fetchEvents = async () => {
