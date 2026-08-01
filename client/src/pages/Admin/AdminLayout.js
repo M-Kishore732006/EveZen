@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutDashboard, Calendar, MapPin, Users, LogOut, Menu, Bell, Search, Moon, Sun, ChevronDown } from 'lucide-react';
+import { LayoutDashboard, Calendar, MapPin, Users, LogOut, Menu, Bell, Search, Moon, Sun, ChevronDown, MessageSquare } from 'lucide-react';
 import { Dropdown, Badge } from 'react-bootstrap';
 import axios from 'axios';
 
@@ -78,7 +78,8 @@ const AdminLayout = () => {
         { path: '/admin', icon: LayoutDashboard, label: 'Dashboard', end: true },
         { path: '/admin/events', icon: Calendar, label: 'Events' },
         { path: '/admin/venues', icon: MapPin, label: 'Venues' },
-        { path: '/admin/staff', icon: Users, label: 'Staff' }
+        { path: '/admin/staff', icon: Users, label: 'Staff' },
+        { path: '/admin/forums', icon: MessageSquare, label: 'Discussion Forums' }
     ];
 
     return (
@@ -100,9 +101,7 @@ const AdminLayout = () => {
                 className={`shadow-sm sidebar-panel ${!sidebarOpen && isMobile ? 'd-none' : ''}`}
             >
                 <div className="p-4 d-flex align-items-center gap-3">
-                    <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: 'var(--accent-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 'bold' }}>
-                        EZ
-                    </div>
+                    <img src="/favicon.ico" alt="EveZen Logo" style={{ width: '36px', height: '36px', borderRadius: '8px' }} />
                     {sidebarOpen && <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ fontWeight: 700, fontSize: '1.25rem', color: 'var(--primary-color)' }}>EveZen</motion.span>}
                 </div>
                 

@@ -10,6 +10,7 @@ import AdminDashboard from './pages/Admin/Dashboard';
 import EventManagement from './pages/Admin/EventManagement';
 import VenueManagement from './pages/Admin/VenueManagement';
 import StaffManagement from './pages/Admin/StaffManagement';
+import AdminForums from './pages/Admin/Forums';
 
 // Student Imports
 import StudentLayout from './pages/Student/StudentLayout';
@@ -39,12 +40,12 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           
-          {/* Admin Routes */}
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
             <Route path="events" element={<EventManagement />} />
             <Route path="venues" element={<VenueManagement />} />
             <Route path="staff" element={<StaffManagement />} />
+            <Route path="forums" element={<AdminForums />} />
           </Route>
           
           {/* Student Routes */}

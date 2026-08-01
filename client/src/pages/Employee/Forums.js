@@ -13,6 +13,7 @@ const EmployeeForums = () => {
     const [events, setEvents] = useState([]);
     const [activeEvent, setActiveEvent] = useState(null);
     const [activeTab, setActiveTab] = useState('Announcements');
+    const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
 
     useEffect(() => {
@@ -32,6 +33,31 @@ const EmployeeForums = () => {
             setEvents(filtered);
             if (filtered.length > 0) setActiveEvent(filtered[0]);
         } catch (error) { console.error(error); }
+    };
+
+    useEffect(() => {
+        if (activeEvent) fetchMessages();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [activeEvent]);
+
+    const fetchMessages = async () => {
+        if (!activeEvent) return;
+        try {
+            const res = await axios.get(`http://localhost:5000/api/forums/${activeEvent._id}/messages`, { headers: { Authorization: `Bearer ${user.token}` } });
+            setMessages(res.data);
+        } catch (error) { console.error(error); }
+    };
+
+    const handleSendMessage = async (e) => {
+        e.preventDefault();
+        if (!newMessage.trim() || !activeEvent) return;
+        try {
+            await axios.post(`http://localhost:5000/api/forums/${activeEvent._id}/messages`, {
+                content: newMessage, category: activeTab
+            }, { headers: { Authorization: `Bearer ${user.token}` } });
+            setNewMessage('');
+            fetchMessages();
+        } catch (error) { alert(error.response?.data?.message || 'Failed to send message'); }
     };
 
     return (
@@ -75,41 +101,56 @@ const EmployeeForums = () => {
                     <div className="flex-grow-1 p-4 bg-white" style={{ overflowY: 'auto' }}>
                         {activeTab === 'Announcements' && (
                             <div className="d-flex flex-column gap-4">
-                                <div className="p-4 rounded-4 position-relative" style={{ backgroundColor: 'rgba(241, 196, 15, 0.05)', border: '1px solid rgba(241, 196, 15, 0.2)' }}>
-                                    {isFaculty && <Button variant="link" size="sm" className="position-absolute text-muted p-0" style={{ right: '16px', top: '16px' }}>Unpin</Button>}
-                                    <div className="d-flex align-items-center gap-2 text-warning fw-bold small mb-3 text-uppercase"><Pin size={14}/> Pinned by Coordinator</div>
-                                    <div className="d-flex gap-3">
-                                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--primary-color)', color: 'white' }} className="d-flex align-items-center justify-content-center fw-bold flex-shrink-0">JS</div>
-                                        <div>
-                                            <div className="d-flex align-items-center gap-2 mb-1"><span className="fw-bold text-dark">Dr. John Smith</span> <Badge bg="primary">Faculty</Badge> <span className="text-muted small">Yesterday at 10:00 AM</span></div>
-                                            <p className="text-muted mb-0">Welcome to the Hackathon! Please ensure your team leads have downloaded the rulebook from the Resources tab before Friday.</p>
+                                {messages.filter(m => m.category === 'Announcements').length === 0 ? (
+                                    <div className="text-center text-muted p-5">No announcements yet.</div>
+                                ) : (
+                                    messages.filter(m => m.category === 'Announcements').map(m => (
+                                        <div key={m._id} className="p-4 rounded-4 position-relative" style={{ backgroundColor: 'rgba(241, 196, 15, 0.05)', border: '1px solid rgba(241, 196, 15, 0.2)' }}>
+                                            {isFaculty && <Button variant="link" size="sm" className="position-absolute text-muted p-0" style={{ right: '16px', top: '16px' }}>Unpin</Button>}
+                                            <div className="d-flex align-items-center gap-2 text-warning fw-bold small mb-3 text-uppercase"><Pin size={14}/> Official Announcement</div>
+                                            <div className="d-flex gap-3">
+                                                <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--primary-color)', color: 'white' }} className="d-flex align-items-center justify-content-center fw-bold flex-shrink-0">
+                                                    {m.senderId?.name?.charAt(0) || 'E'}
+                                                </div>
+                                                <div>
+                                                    <div className="d-flex align-items-center gap-2 mb-1">
+                                                        <span className="fw-bold text-dark">{m.senderId?.name}</span> 
+                                                        <Badge bg={m.senderId?.role === 'Admin' ? 'danger' : 'primary'}>{m.senderId?.role}</Badge> 
+                                                        <span className="text-muted small">{new Date(m.createdAt).toLocaleString()}</span>
+                                                    </div>
+                                                    <p className="text-muted mb-0">{m.content}</p>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
+                                    ))
+                                )}
                             </div>
                         )}
 
                         {activeTab === 'Questions' && (
                             <div className="d-flex flex-column gap-4">
-                                <div className="d-flex gap-3">
-                                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'rgba(108, 99, 255, 0.1)', color: 'var(--accent-color)' }} className="d-flex align-items-center justify-content-center fw-bold flex-shrink-0">AM</div>
-                                    <div>
-                                        <div className="d-flex align-items-center gap-2 mb-1"><span className="fw-bold text-dark">Alice M.</span> <Badge bg="light" text="dark" className="border">Student</Badge> <span className="text-muted small">2 hours ago</span></div>
-                                        <p className="text-muted text-dark mb-0">Are we allowed to use third-party APIs for our project?</p>
-                                        <Button variant="link" size="sm" className="px-0 mt-1 d-flex align-items-center gap-2 text-decoration-none fw-bold" style={{ fontSize: '0.8rem' }}><Send size={12}/> Reply</Button>
-                                    </div>
-                                </div>
-
-                                <div className="d-flex gap-3 ms-5">
-                                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'var(--primary-color)', color: 'white' }} className="d-flex align-items-center justify-content-center fw-bold flex-shrink-0 small">JS</div>
-                                    <div className="w-100">
-                                        <div className="d-flex align-items-center justify-content-between mb-1">
-                                            <div className="d-flex align-items-center gap-2"><span className="fw-bold text-dark">Dr. John Smith</span> <Badge bg="primary">Faculty</Badge> <span className="text-muted small">1 hour ago</span></div>
-                                            {isFaculty && <Button variant="link" size="sm" className="text-danger p-0 text-decoration-none small" style={{ fontSize: '0.75rem' }}>Delete</Button>}
+                                {messages.filter(m => m.category === 'Questions').length === 0 ? (
+                                    <div className="text-center text-muted p-5">Be the first to ask a question!</div>
+                                ) : (
+                                    messages.filter(m => m.category === 'Questions').map(m => (
+                                        <div key={m._id} className="d-flex gap-3">
+                                            <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: m.senderId?._id === user._id ? 'var(--accent-color)' : 'rgba(108, 99, 255, 0.1)', color: m.senderId?._id === user._id ? 'white' : 'var(--primary-color)' }} className="d-flex align-items-center justify-content-center fw-bold flex-shrink-0">
+                                                {m.senderId?.name?.charAt(0) || 'U'}
+                                            </div>
+                                            <div className="w-100">
+                                                <div className="d-flex align-items-center justify-content-between mb-1">
+                                                    <div className="d-flex align-items-center gap-2">
+                                                        <span className="fw-bold text-dark">{m.senderId?.name}</span> 
+                                                        <Badge bg="light" text="dark" className="border">{m.senderId?.role}</Badge> 
+                                                        <span className="text-muted small">{new Date(m.createdAt).toLocaleString()}</span>
+                                                    </div>
+                                                    {isFaculty && <Button variant="link" size="sm" className="text-danger p-0 text-decoration-none small" style={{ fontSize: '0.75rem' }}>Delete</Button>}
+                                                </div>
+                                                <p className="text-muted text-dark mb-0">{m.content}</p>
+                                            </div>
                                         </div>
-                                        <p className="text-muted text-dark mb-0">Yes, as long as they are publicly accessible and documented in your final presentation.</p>
-                                    </div>
-                                </div>
+                                    ))
+                                )}
                             </div>
                         )}
 
@@ -136,23 +177,25 @@ const EmployeeForums = () => {
 
                     {(activeTab !== 'Resources' || isFaculty) && (
                         <div className="p-4 bg-white border-top">
-                            <InputGroup>
-                                {isFaculty && activeTab === 'Resources' && (
-                                     <Button variant="light" className="border bg-white text-muted shadow-sm d-flex align-items-center px-4" style={{ borderRadius: '24px 0 0 24px', height: '48px' }}>
-                                        <Paperclip size={18} className="me-2"/> Attach File
-                                     </Button>
-                                )}
-                                <Form.Control 
-                                    placeholder={!isFaculty && activeTab === 'Resources' ? 'Read-only mode' : `Type to post in ${activeTab}...`} 
-                                    className="bg-light border-0 shadow-none" 
-                                    style={{ borderRadius: (isFaculty && activeTab === 'Resources') ? '0' : '24px 0 0 24px', paddingLeft: '20px', height: '48px' }}
-                                    value={newMessage} onChange={e => setNewMessage(e.target.value)}
-                                    disabled={!isFaculty && activeTab === 'Resources'}
-                                />
-                                <Button variant="primary" className="d-flex align-items-center px-4 shadow-sm" style={{ borderRadius: '0 24px 24px 0', height: '48px' }} disabled={!isFaculty && activeTab === 'Resources'}>
-                                    <Send size={18} className="ms-1"/>
-                                </Button>
-                            </InputGroup>
+                            <Form onSubmit={handleSendMessage}>
+                                <InputGroup>
+                                    {isFaculty && activeTab === 'Resources' && (
+                                         <Button variant="light" className="border bg-white text-muted shadow-sm d-flex align-items-center px-4" style={{ borderRadius: '24px 0 0 24px', height: '48px' }}>
+                                            <Paperclip size={18} className="me-2"/> Attach File
+                                         </Button>
+                                    )}
+                                    <Form.Control 
+                                        placeholder={!isFaculty && activeTab === 'Resources' ? 'Read-only mode' : `Type to post in ${activeTab}...`} 
+                                        className="bg-light border-0 shadow-none" 
+                                        style={{ borderRadius: (isFaculty && activeTab === 'Resources') ? '0' : '24px 0 0 24px', paddingLeft: '20px', height: '48px' }}
+                                        value={newMessage} onChange={e => setNewMessage(e.target.value)}
+                                        disabled={!isFaculty && activeTab === 'Resources'}
+                                    />
+                                    <Button type="submit" variant="primary" className="d-flex align-items-center px-4 shadow-sm" style={{ borderRadius: '0 24px 24px 0', height: '48px' }} disabled={!isFaculty && activeTab === 'Resources'}>
+                                        <Send size={18} className="ms-1"/>
+                                    </Button>
+                                </InputGroup>
+                            </Form>
                         </div>
                     )}
                 </Card>

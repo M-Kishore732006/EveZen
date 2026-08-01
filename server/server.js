@@ -19,6 +19,7 @@ app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/venues", require("./routes/venueRoutes"));
 app.use("/api/events", require("./routes/eventRoutes"));
 app.use("/api/notifications", require("./routes/notificationRoutes"));
+app.use("/api/forums", require("./routes/forumRoutes"));
 
 app.get("/", (req, res) => {
     res.send("EveZen API is running...");

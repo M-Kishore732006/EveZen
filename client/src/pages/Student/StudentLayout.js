@@ -92,7 +92,7 @@ const StudentLayout = () => {
                 className={`shadow-sm sidebar-panel ${!sidebarOpen && isMobile ? 'd-none' : ''}`}
             >
                 <div className="p-4 d-flex align-items-center gap-3">
-                    <div style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: 'var(--accent-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 'bold' }}>EZ</div>
+                    <img src="/favicon.ico" alt="EveZen Logo" style={{ width: '36px', height: '36px', borderRadius: '8px' }} />
                     {sidebarOpen && <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ fontWeight: 700, fontSize: '1.25rem', color: 'var(--primary-color)' }}>EveZen</motion.span>}
                 </div>
                 

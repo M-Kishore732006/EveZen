@@ -21,6 +21,13 @@ const EventDetails = () => {
     const [regStep, setRegStep] = useState(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
+    
+    useEffect(() => {
+        if (event?.registeredStudents?.some(s => s._id === user._id)) {
+            setIsSuccess(true);
+            setRegStep(4);
+        }
+    }, [event, user._id]);
     const [teamName, setTeamName] = useState('');
     const [members, setMembers] = useState([{ name: '', email: '' }]);
 
@@ -41,16 +48,19 @@ const EventDetails = () => {
         if (members.length < (event?.teamSize || 2)) setMembers([...members, { name: '', email: '' }]);
     };
 
-    const submitRegistration = (e) => {
+    const submitRegistration = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
-        // Simulate API delay
-        setTimeout(() => {
+        try {
+            await axios.post(`http://localhost:5000/api/events/${id}/register`, {}, { headers: { Authorization: `Bearer ${user.token}` } });
             setIsSubmitting(false);
             setIsSuccess(true);
             setRegStep(4);
-            // In a real app we'd save this to backend. For UI UX we just show success.
-        }, 1500);
+            fetchEvent(); // Refresh to capture new status
+        } catch (error) {
+            setIsSubmitting(false);
+            alert(error.response?.data?.message || 'Failed to register');
+        }
     };
 
     if (!event) return <div className="p-5 text-center text-muted">Loading event details...</div>;
@@ -228,10 +238,21 @@ const EventDetails = () => {
 
                             {activeTab === 'forum' && (
                                 <Card className="border-0 shadow-sm p-5 text-center">
-                                    <MessageSquare size={48} className="text-muted mb-3 mx-auto opacity-50" />
-                                    <h5 className="fw-bold mb-2">Forum Locked</h5>
-                                    <p className="text-muted mb-4">You must securely register for this event to unlock access to the dedicated discussion forum and resources.</p>
-                                    <Button variant="outline-primary" onClick={() => setActiveTab('register')}>Register Now</Button>
+                                    {event.registeredStudents?.some(s => s._id === user._id) ? (
+                                        <>
+                                            <MessageSquare size={48} className="text-primary mb-3 mx-auto" />
+                                            <h5 className="fw-bold mb-2">Forum Unlocked</h5>
+                                            <p className="text-muted mb-4">You have access to this event's dedicated discussion forum.</p>
+                                            <Button variant="primary" onClick={() => navigate('/student/forums')}>Go to Forums</Button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <MessageSquare size={48} className="text-muted mb-3 mx-auto opacity-50" />
+                                            <h5 className="fw-bold mb-2">Forum Locked</h5>
+                                            <p className="text-muted mb-4">You must securely register for this event to unlock access to the dedicated discussion forum and resources.</p>
+                                            <Button variant="outline-primary" onClick={() => setActiveTab('register')}>Register Now</Button>
+                                        </>
+                                    )}
                                 </Card>
                             )}
                         </motion.div>

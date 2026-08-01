@@ -156,7 +156,7 @@ const markAttendance = async (req, res) => {
 const generateOtp = async (req, res) => {
     try {
         const eventId = req.params.id;
-        const userId = req.user._id;
+        const userId = req.user._id || req.user.id;
 
         const event = await Event.findById(eventId);
         if (!event) return res.status(404).json({ message: 'Event not found.' });

@@ -362,6 +362,10 @@ body.dark-theme .text-black {
 }
 
 /* Premium FullCalendar Overrides (Light & Dark Unified) */
+.fc a {
+  text-decoration: none !important;
+}
+
 .fc-theme-standard th, .fc-theme-standard td, .fc-theme-standard .fc-scrollgrid {
   border: none !important;
 }

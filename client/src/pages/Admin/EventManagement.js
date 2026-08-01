@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import axios from 'axios';
 import { Card, Button, Modal, Form, Badge } from 'react-bootstrap';
-import { Edit, Trash, Plus, Calendar, Clock, MapPin, Info } from 'lucide-react';
+import { Edit, Trash, Plus, Calendar, Clock, MapPin, Info, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Select from 'react-select';
 
@@ -12,6 +12,9 @@ const EventManagement = () => {
     const [venues, setVenues] = useState([]);
     const [facultyList, setFacultyList] = useState([]);
     const [staffList, setStaffList] = useState([]);
+    
+    const [showParticipantsModal, setShowParticipantsModal] = useState(false);
+    const [selectedEventForParticipants, setSelectedEventForParticipants] = useState(null);
     
     const [showModal, setShowModal] = useState(false);
     const [formData, setFormData] = useState({
@@ -93,6 +96,11 @@ const EventManagement = () => {
         setShowModal(true);
     };
 
+    const handleViewParticipants = (ev) => {
+        setSelectedEventForParticipants(ev);
+        setShowParticipantsModal(true);
+    };
+
     const containerVariants = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.1 } } };
     const itemVariants = { hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } };
 
@@ -149,8 +157,9 @@ const EventManagement = () => {
                                         <MapPin size={16} className="text-muted" /> <span className="text-truncate">{ev.venue?.name || 'TBA'}</span>
                                     </div>
                                     <div className="text-end d-flex justify-content-end gap-2">
-                                        <button className="btn btn-light btn-sm rounded-circle p-2 d-flex" onClick={() => handleEdit(ev)}><Edit size={16} className="text-primary" /></button>
-                                        <button className="btn btn-light btn-sm rounded-circle p-2 d-flex" onClick={() => handleDelete(ev._id)}><Trash size={16} className="text-danger" /></button>
+                                        <button className="btn btn-light btn-sm rounded-circle p-2 d-flex" title="View Participants" onClick={() => handleViewParticipants(ev)}><Users size={16} className="text-secondary" /></button>
+                                        <button className="btn btn-light btn-sm rounded-circle p-2 d-flex" title="Edit Event" onClick={() => handleEdit(ev)}><Edit size={16} className="text-primary" /></button>
+                                        <button className="btn btn-light btn-sm rounded-circle p-2 d-flex" title="Delete Event" onClick={() => handleDelete(ev._id)}><Trash size={16} className="text-danger" /></button>
                                     </div>
                                 </motion.div>
                             ))}
@@ -240,6 +249,40 @@ const EventManagement = () => {
                 <Modal.Footer style={{ borderTop: 'none', padding: '1.5rem', backgroundColor: '#f8f9fb', borderRadius: '0 0 16px 16px' }}>
                     <Button variant="light" onClick={() => setShowModal(false)} className="px-4">Cancel</Button>
                     <Button variant="primary" onClick={handleSave} className="px-4">Confirm & Save</Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* Participants Viewing Modal */}
+            <Modal show={showParticipantsModal} onHide={() => setShowParticipantsModal(false)} size="md" centered>
+                <Modal.Header closeButton style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', backgroundColor: '#f8f9fb' }}>
+                    <Modal.Title style={{ fontWeight: 600, fontSize: '1.2rem' }}>
+                        Registered Students <Badge bg="success" className="ms-2">{selectedEventForParticipants?.registeredStudents?.length || 0}</Badge>
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body className="p-0" style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                    {selectedEventForParticipants?.registeredStudents?.length === 0 ? (
+                        <div className="text-center text-muted p-5">
+                            <Users size={32} className="mb-2" style={{ opacity: 0.3 }} />
+                            <p className="mb-0">No students are currently registered for this event.</p>
+                        </div>
+                    ) : (
+                        <div className="list-group list-group-flush">
+                            {selectedEventForParticipants?.registeredStudents?.map(student => (
+                                <div key={student._id} className="list-group-item d-flex align-items-center gap-3 py-3 px-4">
+                                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'rgba(108, 99, 255, 0.1)', color: 'var(--primary-color)' }} className="d-flex align-items-center justify-content-center fw-bold flex-shrink-0">
+                                        {student.name.charAt(0)}
+                                    </div>
+                                    <div>
+                                        <h6 className="mb-0 fw-bold">{student.name}</h6>
+                                        <small className="text-muted">{student.email}</small>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </Modal.Body>
+                <Modal.Footer className="bg-light border-0">
+                    <Button variant="secondary" onClick={() => setShowParticipantsModal(false)}>Close</Button>
                 </Modal.Footer>
             </Modal>
         </motion.div>

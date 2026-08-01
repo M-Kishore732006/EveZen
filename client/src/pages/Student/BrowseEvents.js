@@ -24,14 +24,8 @@ const BrowseEvents = () => {
         } catch (error) { console.error(error); }
     };
 
-    const handleRegister = async (eventId) => {
-        try {
-            await axios.post(`http://localhost:5000/api/events/${eventId}/register`, {}, { headers: { Authorization: `Bearer ${user.token}` } });
-            alert('Successfully registered!');
-            fetchEvents(); // Refresh to get updated lists
-        } catch (error) {
-            alert(error.response?.data?.message || 'Failed to register');
-        }
+    const handleRegister = (eventId) => {
+        navigate(`/student/events/${eventId}?tab=register`);
     };
 
     const containerVariants = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.1 } } };
