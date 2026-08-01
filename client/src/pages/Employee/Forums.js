@@ -23,7 +23,7 @@ const EmployeeForums = () => {
 
     const fetchEvents = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/events', { headers: { Authorization: `Bearer ${user.token}` } });
+            const res = await axios.get('/api/events', { headers: { Authorization: `Bearer ${user.token}` } });
             
             const filtered = res.data.filter(ev => {
                 if (isStaff) return ev.assignedStaff?.some(s => s._id === user._id);
@@ -43,7 +43,7 @@ const EmployeeForums = () => {
     const fetchMessages = async () => {
         if (!activeEvent) return;
         try {
-            const res = await axios.get(`http://localhost:5000/api/forums/${activeEvent._id}/messages`, { headers: { Authorization: `Bearer ${user.token}` } });
+            const res = await axios.get(`/api/forums/${activeEvent._id}/messages`, { headers: { Authorization: `Bearer ${user.token}` } });
             setMessages(res.data);
         } catch (error) { console.error(error); }
     };
@@ -52,7 +52,7 @@ const EmployeeForums = () => {
         e.preventDefault();
         if (!newMessage.trim() || !activeEvent) return;
         try {
-            await axios.post(`http://localhost:5000/api/forums/${activeEvent._id}/messages`, {
+            await axios.post(`/api/forums/${activeEvent._id}/messages`, {
                 content: newMessage, category: activeTab
             }, { headers: { Authorization: `Bearer ${user.token}` } });
             setNewMessage('');
@@ -63,7 +63,7 @@ const EmployeeForums = () => {
     const handleDeleteMessage = async (msgId) => {
         if (!window.confirm("Are you sure you want to delete this message?")) return;
         try {
-            await axios.delete(`http://localhost:5000/api/forums/${activeEvent._id}/messages/${msgId}`, { headers: { Authorization: `Bearer ${user.token}` } });
+            await axios.delete(`/api/forums/${activeEvent._id}/messages/${msgId}`, { headers: { Authorization: `Bearer ${user.token}` } });
             fetchMessages();
         } catch (error) { alert(error.response?.data?.message || 'Failed to delete message'); }
     };

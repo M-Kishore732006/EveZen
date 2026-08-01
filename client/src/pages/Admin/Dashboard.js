@@ -33,14 +33,14 @@ const Dashboard = () => {
 
     const fetchStats = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/events/stats', { headers: { Authorization: `Bearer ${user.token}` } });
+            const res = await axios.get('/api/events/stats', { headers: { Authorization: `Bearer ${user.token}` } });
             setStats(res.data);
         } catch (error) { console.error('Error fetching stats:', error); }
     };
 
     const fetchEvents = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/events', { headers: { Authorization: `Bearer ${user.token}` } });
+            const res = await axios.get('/api/events', { headers: { Authorization: `Bearer ${user.token}` } });
             setEvents(res.data);
         } catch (error) { console.error('Error fetching events:', error); }
     };

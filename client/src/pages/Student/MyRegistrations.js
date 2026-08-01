@@ -24,7 +24,7 @@ const MyRegistrations = () => {
 
     const fetchRegistrations = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/events', { headers: { Authorization: `Bearer ${user.token}` } });
+            const res = await axios.get('/api/events', { headers: { Authorization: `Bearer ${user.token}` } });
             const filtered = res.data.filter(ev => ev.registeredStudents?.some(s => s._id === user._id));
             setRegistrations(filtered);
         } catch (error) { console.error(error); }
@@ -41,7 +41,7 @@ const MyRegistrations = () => {
                 setTimeLeft(60);
                 
                 try {
-                    const res = await axios.post(`http://localhost:5000/api/events/${selectedEventId}/generate-pass`, {}, {
+                    const res = await axios.post(`/api/events/${selectedEventId}/generate-pass`, {}, {
                         headers: { Authorization: `Bearer ${user.token}` }
                     });
                     setOtpData(res.data.otp);

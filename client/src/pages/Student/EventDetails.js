@@ -38,7 +38,7 @@ const EventDetails = () => {
 
     const fetchEvent = async () => {
         try {
-            const res = await axios.get(`http://localhost:5000/api/events`, { headers: { Authorization: `Bearer ${user.token}` } });
+            const res = await axios.get(`/api/events`, { headers: { Authorization: `Bearer ${user.token}` } });
             const ev = res.data.find(e => e._id === id);
             setEvent(ev);
         } catch (error) { console.error(error); }
@@ -112,7 +112,7 @@ const EventDetails = () => {
                 teamName: teamName || `${user.name}'s Team`,
                 members: members
             } : {};
-            await axios.post(`http://localhost:5000/api/events/${id}/register`, payload, { headers: { Authorization: `Bearer ${user.token}` } });
+            await axios.post(`/api/events/${id}/register`, payload, { headers: { Authorization: `Bearer ${user.token}` } });
             setIsSubmitting(false);
             setIsSuccess(true);
             setRegStep(4);

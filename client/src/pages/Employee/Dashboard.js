@@ -30,7 +30,7 @@ const EmployeeDashboard = () => {
 
     const fetchEvents = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/events', { headers: { Authorization: `Bearer ${user.token}` } });
+            const res = await axios.get('/api/events', { headers: { Authorization: `Bearer ${user.token}` } });
             
             // Filter events assigned to THIS user
             const filtered = res.data.filter(ev => {

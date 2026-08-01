@@ -33,7 +33,7 @@ const EventManagement = () => {
 
     const fetchEvents = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/events', { headers: { Authorization: `Bearer ${user.token}` } });
+            const res = await axios.get('/api/events', { headers: { Authorization: `Bearer ${user.token}` } });
             setEvents(res.data);
         } catch (error) { console.error(error); }
     };
@@ -41,9 +41,9 @@ const EventManagement = () => {
     const fetchLookups = async () => {
         try {
             const [vRes, fRes, sRes] = await Promise.all([
-                axios.get('http://localhost:5000/api/venues', { headers: { Authorization: `Bearer ${user.token}` } }),
-                axios.get('http://localhost:5000/api/users/faculty', { headers: { Authorization: `Bearer ${user.token}` } }),
-                axios.get('http://localhost:5000/api/users/staff', { headers: { Authorization: `Bearer ${user.token}` } })
+                axios.get('/api/venues', { headers: { Authorization: `Bearer ${user.token}` } }),
+                axios.get('/api/users/faculty', { headers: { Authorization: `Bearer ${user.token}` } }),
+                axios.get('/api/users/staff', { headers: { Authorization: `Bearer ${user.token}` } })
             ]);
             setVenues(vRes.data);
             setFacultyList(fRes.data);
@@ -67,9 +67,9 @@ const EventManagement = () => {
             if (payload.participationType === 'Individual') payload.teamSize = 1;
 
             if (formData.id) {
-                await axios.put(`http://localhost:5000/api/events/${formData.id}`, payload, { headers: { Authorization: `Bearer ${user.token}` } });
+                await axios.put(`/api/events/${formData.id}`, payload, { headers: { Authorization: `Bearer ${user.token}` } });
             } else {
-                await axios.post('http://localhost:5000/api/events', payload, { headers: { Authorization: `Bearer ${user.token}` } });
+                await axios.post('/api/events', payload, { headers: { Authorization: `Bearer ${user.token}` } });
             }
             setShowModal(false);
             fetchEvents();
@@ -81,7 +81,7 @@ const EventManagement = () => {
     const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this event? This action cannot be undone.')) {
             try {
-                await axios.delete(`http://localhost:5000/api/events/${id}`, { headers: { Authorization: `Bearer ${user.token}` } });
+                await axios.delete(`/api/events/${id}`, { headers: { Authorization: `Bearer ${user.token}` } });
                 fetchEvents();
             } catch (err) { alert('Error deleting event'); }
         }

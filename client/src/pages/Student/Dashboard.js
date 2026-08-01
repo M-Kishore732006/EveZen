@@ -25,7 +25,7 @@ const Dashboard = () => {
     // For demo purposes, we treat all available events as actionable by the student.
     const fetchRecentEvents = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/events', { headers: { Authorization: `Bearer ${user.token}` } });
+            const res = await axios.get('/api/events', { headers: { Authorization: `Bearer ${user.token}` } });
             const allEvents = res.data;
             setEvents(allEvents);
 

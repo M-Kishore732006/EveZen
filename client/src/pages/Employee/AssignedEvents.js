@@ -34,7 +34,7 @@ const AssignedEvents = () => {
 
     const fetchAssignedEvents = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/events', { headers: { Authorization: `Bearer ${user.token}` } });
+            const res = await axios.get('/api/events', { headers: { Authorization: `Bearer ${user.token}` } });
             const filtered = res.data.filter(ev => {
                 if (isStaff) return ev.assignedStaff?.some(s => s._id === user._id);
                 return ev.assignedFaculty?.some(f => f._id === user._id);
@@ -55,7 +55,7 @@ const AssignedEvents = () => {
             scanner.render(async (decodedText) => {
                 scanner.pause(true);
                 try {
-                    const res = await axios.post(`http://localhost:5000/api/events/${scanningEventId}/attendance`, 
+                    const res = await axios.post(`/api/events/${scanningEventId}/attendance`, 
                         { qrData: decodedText }, 
                         { headers: { Authorization: `Bearer ${user.token}` } }
                     );
@@ -117,7 +117,7 @@ const AssignedEvents = () => {
     const handleOtpSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post(`http://localhost:5000/api/events/${scanningEventId}/attendance-otp`, 
+            const res = await axios.post(`/api/events/${scanningEventId}/attendance-otp`, 
                 { otp: otpInput }, 
                 { headers: { Authorization: `Bearer ${user.token}` } }
             );

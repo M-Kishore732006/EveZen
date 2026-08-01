@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, password) => {
         try {
-            const { data } = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+            const { data } = await axios.post('/api/auth/login', { email, password });
             setUser(data);
             localStorage.setItem('user', JSON.stringify(data));
             return data;
@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
 
     const signup = async (userData) => {
         try {
-            const { data } = await axios.post('http://localhost:5000/api/auth/student-signup', userData);
+            const { data } = await axios.post('/api/auth/student-signup', userData);
             setUser(data);
             localStorage.setItem('user', JSON.stringify(data));
             return data;

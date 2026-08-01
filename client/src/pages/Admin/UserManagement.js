@@ -20,14 +20,14 @@ const UserManagement = () => {
 
     const fetchUsers = async () => {
         try {
-            const stuRes = await axios.get('http://localhost:5000/api/users/students', { headers: { Authorization: `Bearer ${user.token}` } });
+            const stuRes = await axios.get('/api/users/students', { headers: { Authorization: `Bearer ${user.token}` } });
             setStudents(stuRes.data);
         } catch (error) { console.error(error); }
     };
 
     const fetchEvents = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/events', { headers: { Authorization: `Bearer ${user.token}` } });
+            const res = await axios.get('/api/events', { headers: { Authorization: `Bearer ${user.token}` } });
             setEvents(res.data);
         } catch (error) { console.error(error); }
     };
@@ -43,7 +43,7 @@ const UserManagement = () => {
     const handleDelete = async (id) => {
         if (window.confirm(`Delete this user permanently?`)) {
             try {
-                await axios.delete(`http://localhost:5000/api/users/students/${id}`, { headers: { Authorization: `Bearer ${user.token}` } });
+                await axios.delete(`/api/users/students/${id}`, { headers: { Authorization: `Bearer ${user.token}` } });
                 fetchUsers();
             } catch (err) { alert('Error deleting user'); }
         }

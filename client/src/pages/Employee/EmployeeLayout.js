@@ -17,7 +17,7 @@ const EmployeeLayout = ({ role }) => {
 
     useEffect(() => {
         if (user?.token) {
-            axios.get('http://localhost:5000/api/notifications', {
+            axios.get('/api/notifications', {
                 headers: { Authorization: `Bearer ${user.token}` }
             })
             .then(res => setNotifications(res.data))
@@ -56,7 +56,7 @@ const EmployeeLayout = ({ role }) => {
     const handleMarkAsRead = async () => {
         if (!user?.token) return;
         try {
-            await axios.post('http://localhost:5000/api/notifications/mark-read', {}, {
+            await axios.post('/api/notifications/mark-read', {}, {
                 headers: { Authorization: `Bearer ${user.token}` }
             });
             setNotifications(prev => prev.map(n => ({ ...n, read: true })));

@@ -29,7 +29,7 @@ const VenueManagement = () => {
 
     const fetchVenues = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/venues', { headers: { Authorization: `Bearer ${user.token}` } });
+            const res = await axios.get('/api/venues', { headers: { Authorization: `Bearer ${user.token}` } });
             setVenues(res.data);
             setDetailedVenues({ available: res.data, booked: [] }); // default state before query
         } catch (error) { console.error(error); }
@@ -38,7 +38,7 @@ const VenueManagement = () => {
     const checkAvailability = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.get(`http://localhost:5000/api/venues/status?date=${filterDate}&startTime=${filterStart}&endTime=${filterEnd}`, {
+            const res = await axios.get(`/api/venues/status?date=${filterDate}&startTime=${filterStart}&endTime=${filterEnd}`, {
                 headers: { Authorization: `Bearer ${user.token}` }
             });
             setDetailedVenues({ available: res.data.availableVenues, booked: res.data.bookedDetails });
@@ -55,9 +55,9 @@ const VenueManagement = () => {
         setError('');
         try {
             if (formData.id) {
-                await axios.put(`http://localhost:5000/api/venues/${formData.id}`, formData, { headers: { Authorization: `Bearer ${user.token}` } });
+                await axios.put(`/api/venues/${formData.id}`, formData, { headers: { Authorization: `Bearer ${user.token}` } });
             } else {
-                await axios.post('http://localhost:5000/api/venues', formData, { headers: { Authorization: `Bearer ${user.token}` } });
+                await axios.post('/api/venues', formData, { headers: { Authorization: `Bearer ${user.token}` } });
             }
             setShowModal(false);
             fetchVenues();
@@ -69,7 +69,7 @@ const VenueManagement = () => {
     const handleDelete = async (id) => {
         if (window.confirm('Delete this venue?')) {
             try {
-                await axios.delete(`http://localhost:5000/api/venues/${id}`, { headers: { Authorization: `Bearer ${user.token}` } });
+                await axios.delete(`/api/venues/${id}`, { headers: { Authorization: `Bearer ${user.token}` } });
                 fetchVenues();
             } catch (err) { alert('Error deleting venue'); }
         }

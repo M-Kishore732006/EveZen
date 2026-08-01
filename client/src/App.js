@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import axios from 'axios';
+
 
 // Admin Imports
 import AdminLayout from './pages/Admin/AdminLayout';
@@ -31,6 +33,9 @@ import EmployeeTasks from './pages/Employee/Tasks';
 
 // Common User
 import UserProfile from './pages/Common/Profile';
+
+// Configure Axios Global Defaults for Production & Development
+axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 function App() {
   return (

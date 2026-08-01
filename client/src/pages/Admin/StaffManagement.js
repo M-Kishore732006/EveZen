@@ -28,9 +28,9 @@ const StaffManagement = () => {
     const fetchUsers = async () => {
         try {
             const [fRes, sRes, stuRes] = await Promise.all([
-                axios.get('http://localhost:5000/api/users/faculty', { headers: { Authorization: `Bearer ${user.token}` } }),
-                axios.get('http://localhost:5000/api/users/staff', { headers: { Authorization: `Bearer ${user.token}` } }),
-                axios.get('http://localhost:5000/api/users/students', { headers: { Authorization: `Bearer ${user.token}` } })
+                axios.get('/api/users/faculty', { headers: { Authorization: `Bearer ${user.token}` } }),
+                axios.get('/api/users/staff', { headers: { Authorization: `Bearer ${user.token}` } }),
+                axios.get('/api/users/students', { headers: { Authorization: `Bearer ${user.token}` } })
             ]);
             setFaculty(fRes.data);
             setStaff(sRes.data);
@@ -40,7 +40,7 @@ const StaffManagement = () => {
 
     const fetchEvents = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/events', { headers: { Authorization: `Bearer ${user.token}` } });
+            const res = await axios.get('/api/events', { headers: { Authorization: `Bearer ${user.token}` } });
             setEvents(res.data);
         } catch (error) { console.error(error); }
     };
@@ -64,9 +64,9 @@ const StaffManagement = () => {
             if (!payload.workType) delete payload.workType;
 
             if (formData.id) {
-                await axios.put(`http://localhost:5000/api/users/${endpoint}/${formData.id}`, payload, { headers: { Authorization: `Bearer ${user.token}` } });
+                await axios.put(`/api/users/${endpoint}/${formData.id}`, payload, { headers: { Authorization: `Bearer ${user.token}` } });
             } else {
-                await axios.post(`http://localhost:5000/api/users/${endpoint}`, payload, { headers: { Authorization: `Bearer ${user.token}` } });
+                await axios.post(`/api/users/${endpoint}`, payload, { headers: { Authorization: `Bearer ${user.token}` } });
             }
             setShowModal(false);
             fetchUsers();
@@ -79,7 +79,7 @@ const StaffManagement = () => {
         if (window.confirm(`Delete this user?`)) {
             try {
                 const endpoint = activeTab === 'faculty' ? 'faculty' : activeTab === 'staff' ? 'staff' : 'students';
-                await axios.delete(`http://localhost:5000/api/users/${endpoint}/${id}`, { headers: { Authorization: `Bearer ${user.token}` } });
+                await axios.delete(`/api/users/${endpoint}/${id}`, { headers: { Authorization: `Bearer ${user.token}` } });
                 fetchUsers();
             } catch (err) { alert('Error deleting user'); }
         }

@@ -25,7 +25,7 @@ const Profile = () => {
         }
         setLoading(true);
         try {
-            await axios.post('http://localhost:5000/api/users/change-password', {
+            await axios.post('/api/users/change-password', {
                 currentPassword, newPassword
             }, { headers: { Authorization: `Bearer ${user.token}` } });
             
