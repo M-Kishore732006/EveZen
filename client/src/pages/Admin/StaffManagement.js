@@ -9,6 +9,7 @@ const StaffManagement = () => {
     const { user } = useContext(AuthContext);
     const [faculty, setFaculty] = useState([]);
     const [staff, setStaff] = useState([]);
+    const [students, setStudents] = useState([]);
     const [events, setEvents] = useState([]);
     const [activeTab, setActiveTab] = useState('faculty');
 
@@ -26,12 +27,14 @@ const StaffManagement = () => {
 
     const fetchUsers = async () => {
         try {
-            const [fRes, sRes] = await Promise.all([
+            const [fRes, sRes, stuRes] = await Promise.all([
                 axios.get('http://localhost:5000/api/users/faculty', { headers: { Authorization: `Bearer ${user.token}` } }),
-                axios.get('http://localhost:5000/api/users/staff', { headers: { Authorization: `Bearer ${user.token}` } })
+                axios.get('http://localhost:5000/api/users/staff', { headers: { Authorization: `Bearer ${user.token}` } }),
+                axios.get('http://localhost:5000/api/users/students', { headers: { Authorization: `Bearer ${user.token}` } })
             ]);
             setFaculty(fRes.data);
             setStaff(sRes.data);
+            setStudents(stuRes.data);
         } catch (error) { console.error(error); }
     };
 
@@ -47,6 +50,7 @@ const StaffManagement = () => {
         events.forEach(ev => {
             if (type === 'faculty' && ev.assignedFaculty?.some(f => f._id === userId)) count++;
             if (type === 'staff' && ev.assignedStaff?.some(s => s._id === userId)) count++;
+            if (type === 'students' && ev.registeredStudents?.some(s => s._id === userId || s === userId)) count++;
         });
         return count;
     };
@@ -72,9 +76,9 @@ const StaffManagement = () => {
     };
 
     const handleDelete = async (id, isFaculty) => {
-        if (window.confirm(`Delete this ${isFaculty ? 'Faculty' : 'Staff'} member?`)) {
+        if (window.confirm(`Delete this user?`)) {
             try {
-                const endpoint = isFaculty ? 'faculty' : 'staff';
+                const endpoint = activeTab === 'faculty' ? 'faculty' : activeTab === 'staff' ? 'staff' : 'students';
                 await axios.delete(`http://localhost:5000/api/users/${endpoint}/${id}`, { headers: { Authorization: `Bearer ${user.token}` } });
                 fetchUsers();
             } catch (err) { alert('Error deleting user'); }
@@ -94,7 +98,7 @@ const StaffManagement = () => {
     const containerVariants = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.05 } } };
     const itemVariants = { hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } };
 
-    const activeList = activeTab === 'faculty' ? faculty : staff;
+    const activeList = activeTab === 'faculty' ? faculty : activeTab === 'staff' ? staff : students;
 
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="h-100 d-flex flex-column">
@@ -103,7 +107,7 @@ const StaffManagement = () => {
                     <h3 style={{ fontWeight: 700, color: 'var(--primary-color)' }}>Staff Roll</h3>
                     <p className="text-muted mb-0">Manage personnel assignments and directory accounts.</p>
                 </div>
-                <Button variant="primary" onClick={openCreate} className="d-flex align-items-center gap-2 shadow-sm">
+                <Button variant="primary" onClick={openCreate} className="d-flex align-items-center gap-2 shadow-sm" style={{ visibility: activeTab === 'students' ? 'hidden' : 'visible' }}>
                     <Plus size={18} /> Register {activeTab === 'faculty' ? 'Faculty' : 'Staff'}
                 </Button>
             </div>

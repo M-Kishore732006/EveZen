@@ -95,4 +95,18 @@ const changePassword = async (req, res) => {
     }
 };
 
-module.exports = { getFaculty, createFaculty, updateFaculty, deleteFaculty, getStaff, createStaff, updateStaff, deleteStaff, changePassword };
+const getStudents = async (req, res) => {
+    try {
+        const students = await User.find({ role: 'Student' }).select('-password');
+        res.json(students);
+    } catch (error) { res.status(500).json({ message: error.message }); }
+};
+
+const deleteStudent = async (req, res) => {
+    try {
+        await User.findByIdAndDelete(req.params.id);
+        res.json({ message: 'Student removed' });
+    } catch (error) { res.status(500).json({ message: error.message }); }
+};
+
+module.exports = { getFaculty, createFaculty, updateFaculty, deleteFaculty, getStaff, createStaff, updateStaff, deleteStaff, changePassword, getStudents, deleteStudent };

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import axios from 'axios';
-import { Card, Row, Col, Badge, Button, Modal } from 'react-bootstrap';
+import { Card, Row, Col, Badge, Button, Modal, Form } from 'react-bootstrap';
 import { Calendar, MapPin, Users, Clock, Search, ExternalLink, Activity, QrCode } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -16,6 +16,14 @@ const AssignedEvents = () => {
     const [scanningEventId, setScanningEventId] = useState(null);
     const [scanResult, setScanResult] = useState({ type: '', message: '' });
     const [otpInput, setOtpInput] = useState('');
+    
+    // Support Staff Role-Based Tasks
+    const [showTaskModal, setShowTaskModal] = useState(false);
+    const [selectedEventForTasks, setSelectedEventForTasks] = useState(null);
+    const [completedTasks, setCompletedTasks] = useState(() => {
+        try { return JSON.parse(localStorage.getItem('evezen_completed_tasks')) || {}; } catch { return {}; }
+    });
+
     const isStaff = user?.role === 'Supporting Staff';
     const basePath = isStaff ? '/staff' : '/faculty';
 
@@ -71,6 +79,39 @@ const AssignedEvents = () => {
         setScanResult({ type: '', message: '' });
         setOtpInput('');
         setShowScanner(true);
+    };
+
+    const handleOpenTasks = (ev) => {
+        setSelectedEventForTasks(ev);
+        setShowTaskModal(true);
+    };
+
+    const handleToggleTask = (eventId, idx) => {
+        const updated = { ...completedTasks };
+        if (!updated[eventId]) updated[eventId] = {};
+        updated[eventId][idx] = !updated[eventId][idx];
+        setCompletedTasks(updated);
+        localStorage.setItem('evezen_completed_tasks', JSON.stringify(updated));
+    };
+
+    const getRoleBasedTasks = (workType) => {
+        const type = workType?.toLowerCase() || '';
+        if (type.includes('electrician') || type.includes('electrical') || type.includes('power')) {
+            return ['Check appliance connectivity & safety wire routing', 'Ensure backup generators are strictly on standby', 'Inspect audio/visual power lines & extensions', 'Verify main stage sound system power constraints'];
+        }
+        if (type.includes('security') || type.includes('guard')) {
+            return ['Monitor entry and exit points actively', 'Verify attendee credentials & VIP passes', 'Coordinate with local emergency services if needed', 'Patrol venue perimeter before event start'];
+        }
+        if (type.includes('janitor') || type.includes('cleaning') || type.includes('housekeeping')) {
+            return ['Ensure restrooms are fully stocked & sanitized', 'Clear trash bins periodically before and after the event', 'Sweep and mop the main hall seating aisles', 'Sanitize high-touch surfaces & door handles'];
+        }
+        if (type.includes('cater') || type.includes('food') || type.includes('hospitality')) {
+            return ['Set up refreshment stations & tables', 'Verify dietary requirement lists with caterers', 'Manage water provisions at the speaker podium', 'Clear trays and plates periodically from guest tables'];
+        }
+        if (type.includes('tech') || type.includes('it ') || type.includes('network')) {
+            return ['Test projector and check all display cables', 'Verify Wi-Fi network stability & guest access points', 'Ensure wireless microphone batteries are fully charged', 'Assist external speakers with slide deck uploads'];
+        }
+        return ['Assist faculty coordinators with event logistics', 'Help guide attendees with seating placement', 'Manage basic event equipment setup & breakdown', 'Report any visible issues directly to the head coordinator'];
     };
 
     const handleOtpSubmit = async (e) => {
@@ -134,8 +175,8 @@ const AssignedEvents = () => {
                                                     </Button>
                                                 )}
                                                 {isStaff && (
-                                                    <Button variant="outline-primary" className="flex-grow-1 rounded-pill d-flex align-items-center justify-content-center fw-medium" onClick={() => navigate('/staff/tasks')}>
-                                                        <Activity size={16} className="me-2"/> View Tasks
+                                                    <Button variant="outline-primary" className="flex-grow-1 rounded-pill d-flex align-items-center justify-content-center fw-medium" onClick={() => handleOpenTasks(ev)}>
+                                                        <Activity size={16} className="me-2"/> View Role Tasks
                                                     </Button>
                                                 )}
                                                 <Button variant="primary" className="flex-grow-1 rounded-pill d-flex align-items-center justify-content-center fw-medium" onClick={() => navigate(`${basePath}/forums`)}>
@@ -171,9 +212,9 @@ const AssignedEvents = () => {
                         <form onSubmit={handleOtpSubmit} className="d-flex align-items-center gap-2 justify-content-center">
                             <input 
                                 type="text"
-                                className="form-control text-center fw-bold"
-                                style={{ maxWidth: '200px', fontSize: '1.25rem', letterSpacing: '4px' }}
-                                placeholder="123456"
+                                className="form-control text-center custom-placeholder"
+                                style={{ maxWidth: '200px', fontSize: '1.25rem', letterSpacing: otpInput ? '8px' : 'normal', fontWeight: otpInput ? '700' : '300', opacity: otpInput ? 1 : 0.6 }}
+                                placeholder="Enter Passcode"
                                 maxLength={6}
                                 value={otpInput}
                                 onChange={e => setOtpInput(e.target.value)}
@@ -182,6 +223,48 @@ const AssignedEvents = () => {
                         </form>
                     </div>
                 </Modal.Body>
+            </Modal>
+
+            {/* Role-Based Tasks Modal */}
+            <Modal show={showTaskModal} onHide={() => setShowTaskModal(false)} size="md" centered>
+                <Modal.Header closeButton style={{ borderBottom: '1px solid rgba(0,0,0,0.05)', backgroundColor: '#f8f9fb' }}>
+                    <Modal.Title style={{ fontWeight: 600, fontSize: '1.2rem', color: 'var(--primary-color)' }}>
+                        <Activity size={20} className="me-2 mb-1"/> Event Objectives
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body className="p-4">
+                    <div className="mb-4 text-center">
+                        <Badge bg="primary" className="px-3 py-2 fs-6 mb-2 rounded-pill shadow-sm">{user?.workType || 'General Assignment'}</Badge>
+                        <h5 className="fw-bold mt-2 text-dark">{selectedEventForTasks?.title}</h5>
+                        <p className="text-muted small">Complete the following recommended procedural tasks assigned automatically to your designated department.</p>
+                    </div>
+                    
+                    <div className="d-flex flex-column gap-3">
+                        {getRoleBasedTasks(user?.workType).map((task, idx) => {
+                            const isCompleted = completedTasks[selectedEventForTasks?._id]?.[idx];
+                            return (
+                                <div key={idx} className="d-flex align-items-start gap-3 p-3 bg-light rounded-3 border" style={{ opacity: isCompleted ? 0.6 : 1, transition: 'opacity 0.2s' }}>
+                                    <Form.Check 
+                                        type="checkbox" 
+                                        id={`task-${idx}`} 
+                                        className="mt-1" 
+                                        style={{ transform: 'scale(1.2)' }} 
+                                        checked={!!isCompleted}
+                                        onChange={() => handleToggleTask(selectedEventForTasks?._id, idx)}
+                                    />
+                                    <div>
+                                        <Form.Label htmlFor={`task-${idx}`} className={`mb-0 fw-medium ${isCompleted ? 'text-muted text-decoration-line-through' : 'text-dark'}`} style={{ transition: 'all 0.2s' }}>
+                                            {task}
+                                        </Form.Label>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </Modal.Body>
+                <Modal.Footer className="bg-light border-0">
+                    <Button variant="secondary" onClick={() => setShowTaskModal(false)} className="rounded-pill px-4">Close</Button>
+                </Modal.Footer>
             </Modal>
         </motion.div>
     );

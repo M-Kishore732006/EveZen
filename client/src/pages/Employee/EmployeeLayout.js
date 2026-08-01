@@ -80,10 +80,6 @@ const EmployeeLayout = ({ role }) => {
         { path: basePath, icon: LayoutDashboard, label: 'Dashboard', end: true },
         { path: `${basePath}/assigned`, icon: CalendarCheck, label: 'Assigned Events' },
     ];
-
-    if (role === 'Supporting Staff') {
-        navItems.push({ path: `${basePath}/tasks`, icon: ClipboardCheck, label: 'My Tasks' });
-    }
     
     navItems.push(
         { path: `${basePath}/forums`, icon: MessageSquare, label: 'Event Forums' },
