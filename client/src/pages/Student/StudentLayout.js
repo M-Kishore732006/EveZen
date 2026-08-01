@@ -181,7 +181,6 @@ const StudentLayout = () => {
                                     <div className="text-muted" style={{ fontSize: '0.75rem' }}>Student</div>
                                 </div>
                                 <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--accent-color)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>{user.name.charAt(0).toUpperCase()}</div>
-                                {!isMobile && <ChevronDown size={16} className="text-muted" />}
                             </Dropdown.Toggle>
                             <Dropdown.Menu className="shadow border-0 rounded-3 mt-3" style={{ minWidth: '200px' }}>
                                 <Dropdown.Item className="d-flex align-items-center gap-2 py-2" onClick={() => navigate('/student/profile')}><User size={16}/> Profile</Dropdown.Item>

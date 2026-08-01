@@ -208,9 +208,8 @@ const AdminLayout = () => {
                                     <div className="text-muted" style={{ fontSize: '0.75rem' }}>Administrator</div>
                                 </div>
                                 <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--accent-color)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
-                                    {user.name.charAt(0)}
+                                    {user.name.charAt(0).toUpperCase()}
                                 </div>
-                                {!isMobile && <ChevronDown size={16} className="text-muted" />}
                             </Dropdown.Toggle>
 
                             <Dropdown.Menu className="shadow border-0 rounded-3 mt-3" style={{ minWidth: '200px' }}>
