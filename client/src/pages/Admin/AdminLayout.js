@@ -211,7 +211,7 @@ const AdminLayout = () => {
                             </Dropdown.Toggle>
 
                             <Dropdown.Menu className="shadow border-0 rounded-3 mt-3" style={{ minWidth: '200px' }}>
-                                <Dropdown.Item className="d-flex align-items-center gap-2 py-2"><Users size={16}/> Profile</Dropdown.Item>
+                                <Dropdown.Item onClick={() => navigate('/admin/profile')} className="d-flex align-items-center gap-2 py-2"><Users size={16}/> Profile</Dropdown.Item>
                                 <Dropdown.Divider />
                                 <Dropdown.Item onClick={handleLogout} className="text-danger d-flex align-items-center gap-2 py-2"><LogOut size={16}/> Logout</Dropdown.Item>
                             </Dropdown.Menu>

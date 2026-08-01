@@ -46,6 +46,7 @@ function App() {
             <Route path="venues" element={<VenueManagement />} />
             <Route path="staff" element={<StaffManagement />} />
             <Route path="forums" element={<AdminForums />} />
+            <Route path="profile" element={<UserProfile />} />
           </Route>
           
           {/* Student Routes */}

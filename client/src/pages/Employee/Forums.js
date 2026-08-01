@@ -60,6 +60,14 @@ const EmployeeForums = () => {
         } catch (error) { alert(error.response?.data?.message || 'Failed to send message'); }
     };
 
+    const handleDeleteMessage = async (msgId) => {
+        if (!window.confirm("Are you sure you want to delete this message?")) return;
+        try {
+            await axios.delete(`http://localhost:5000/api/forums/${activeEvent._id}/messages/${msgId}`, { headers: { Authorization: `Bearer ${user.token}` } });
+            fetchMessages();
+        } catch (error) { alert(error.response?.data?.message || 'Failed to delete message'); }
+    };
+
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="h-100 d-flex flex-column">
             <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
@@ -144,7 +152,9 @@ const EmployeeForums = () => {
                                                         <Badge bg="light" text="dark" className="border">{m.senderId?.role}</Badge> 
                                                         <span className="text-muted small">{new Date(m.createdAt).toLocaleString()}</span>
                                                     </div>
-                                                    {isFaculty && <Button variant="link" size="sm" className="text-danger p-0 text-decoration-none small" style={{ fontSize: '0.75rem' }}>Delete</Button>}
+                                                    {(m.senderId?._id === user._id || (isFaculty && m.senderId?.role === 'Student')) && (
+                                                        <Button variant="link" size="sm" className="text-danger p-0 text-decoration-none small" style={{ fontSize: '0.75rem' }} onClick={() => handleDeleteMessage(m._id)}>Delete</Button>
+                                                    )}
                                                 </div>
                                                 <p className="text-muted text-dark mb-0">{m.content}</p>
                                             </div>
@@ -175,7 +185,7 @@ const EmployeeForums = () => {
                         )}
                     </div>
 
-                    {(activeTab !== 'Resources' || isFaculty) && (
+                    {(isFaculty || activeTab === 'Questions') && (
                         <div className="p-4 bg-white border-top">
                             <Form onSubmit={handleSendMessage}>
                                 <InputGroup>

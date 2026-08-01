@@ -1,11 +1,39 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
-import { Card, Button, Form, Row, Col, Badge } from 'react-bootstrap';
+import { Card, Button, Form, Row, Col, Badge, Alert } from 'react-bootstrap';
 import { motion } from 'framer-motion';
 import { User, Mail, Phone, Briefcase, Lock } from 'lucide-react';
+import axios from 'axios';
 
 const Profile = () => {
     const { user } = useContext(AuthContext);
+    
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [msg, setMsg] = useState({ type: '', text: '' });
+    const [loading, setLoading] = useState(false);
+
+    const handlePasswordUpdate = async (e) => {
+        e.preventDefault();
+        setMsg({ type: '', text: '' });
+        if (!currentPassword || !newPassword) {
+            return setMsg({ type: 'danger', text: 'Please fill in both fields.' });
+        }
+        setLoading(true);
+        try {
+            await axios.post('http://localhost:5000/api/users/change-password', {
+                currentPassword, newPassword
+            }, { headers: { Authorization: `Bearer ${user.token}` } });
+            
+            setMsg({ type: 'success', text: 'Password successfully updated!' });
+            setCurrentPassword('');
+            setNewPassword('');
+        } catch (error) {
+            setMsg({ type: 'danger', text: error.response?.data?.message || 'Update failed' });
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="h-100 d-flex flex-column">
@@ -67,17 +95,27 @@ const Profile = () => {
 
                     <Card className="border-0 shadow-sm p-4">
                         <h5 className="fw-bold mb-4">Security</h5>
-                        <Form>
+                        {msg.text && <Alert variant={msg.type} className="small py-2">{msg.text}</Alert>}
+                        <Form onSubmit={handlePasswordUpdate}>
                             <Row className="gy-3 align-items-end">
-                                <Col md={8}>
-                                    <Form.Label className="text-muted small fw-bold text-uppercase">Update Password</Form.Label>
+                                <Col md={4}>
+                                    <Form.Label className="text-muted small fw-bold text-uppercase">Current Password</Form.Label>
                                     <div className="position-relative">
                                         <Lock size={18} className="position-absolute text-muted" style={{ left: '12px', top: '12px' }}/>
-                                        <Form.Control type="password" placeholder="Enter new password" style={{ paddingLeft: '40px' }} />
+                                        <Form.Control type="password" placeholder="Enter current password" style={{ paddingLeft: '40px' }} value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} required />
                                     </div>
                                 </Col>
                                 <Col md={4}>
-                                    <Button variant="primary" className="w-100">Update Security</Button>
+                                    <Form.Label className="text-muted small fw-bold text-uppercase">New Password</Form.Label>
+                                    <div className="position-relative">
+                                        <Lock size={18} className="position-absolute text-muted" style={{ left: '12px', top: '12px' }}/>
+                                        <Form.Control type="password" placeholder="Enter new password" style={{ paddingLeft: '40px' }} value={newPassword} onChange={e => setNewPassword(e.target.value)} required minLength={6} />
+                                    </div>
+                                </Col>
+                                <Col md={4}>
+                                    <Button type="submit" variant="primary" className="w-100 fw-bold" disabled={loading}>
+                                        {loading ? 'Updating...' : 'Update Security'}
+                                    </Button>
                                 </Col>
                             </Row>
                         </Form>

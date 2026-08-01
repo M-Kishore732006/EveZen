@@ -1,9 +1,12 @@
 const express = require('express');
-const { getFaculty, createFaculty, updateFaculty, deleteFaculty, getStaff, createStaff, updateStaff, deleteStaff } = require('../controllers/userController');
+const { getFaculty, createFaculty, updateFaculty, deleteFaculty, getStaff, createStaff, updateStaff, deleteStaff, changePassword } = require('../controllers/userController');
 const { authMiddleware, roleMiddleware } = require('../middlewares/auth');
 const router = express.Router();
 
 router.use(authMiddleware);
+
+router.post('/change-password', changePassword);
+
 router.use(roleMiddleware(['Admin']));
 
 router.route('/faculty').get(getFaculty).post(createFaculty);
