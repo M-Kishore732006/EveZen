@@ -186,17 +186,16 @@ const EventDetails = () => {
                 <ArrowLeft size={18} className="me-2"/> Back to Events
             </Button>
             
-            <Card className="border-0 shadow-sm overflow-hidden mb-4 rounded-4">
-                <div style={{ height: '220px', background: 'linear-gradient(135deg, rgba(50, 30, 72, 0.9), rgba(108, 99, 255, 0.8))' }} className="d-flex flex-column justify-content-center p-5 position-relative">
-                    <div className="position-absolute" style={{ right: '-5%', top: '-20%', opacity: 0.1 }}><Calendar size={300} color="white"/></div>
-                    <Badge bg={event.participationType === 'Team' ? 'info' : 'secondary'} className="w-fit-content mb-3 px-3 py-2 border border-light" style={{ fontSize: '0.85rem' }}>{event.participationType} Event</Badge>
-                    <h2 className="fw-bold text-white mb-2" style={{ zIndex: 1 }}>{event.title}</h2>
-                    <div className="d-flex gap-4 text-white-50" style={{ zIndex: 1 }}>
-                        <span className="d-flex align-items-center gap-1"><Calendar size={16}/> {new Date(event.date).toLocaleDateString()}</span>
-                        <span className="d-flex align-items-center gap-1"><MapPin size={16}/> {event.venue?.name || 'TBA'}</span>
-                    </div>
+            <div className="mb-4">
+                <div className="d-flex align-items-center gap-3 mb-2">
+                    <h2 className="fw-bold text-dark mb-0">{event.title}</h2>
+                    <Badge bg={event.participationType === 'Team' ? 'info' : 'secondary'} className="px-3 py-2">{event.participationType} Event</Badge>
                 </div>
-            </Card>
+                <div className="d-flex gap-4 text-muted">
+                    <span className="d-flex align-items-center gap-1"><Calendar size={16}/> {new Date(event.date).toLocaleDateString()}</span>
+                    <span className="d-flex align-items-center gap-1"><MapPin size={16}/> {event.venue?.name || 'TBA'}</span>
+                </div>
+            </div>
 
             <div className="d-flex p-1 mb-4" style={{ backgroundColor: 'rgba(0,0,0,0.03)', borderRadius: '12px', width: 'fit-content' }}>
                 {['overview', 'register', 'forum'].map(tab => (
@@ -210,7 +209,7 @@ const EventDetails = () => {
             </div>
 
             <Row className="flex-grow-1">
-                <Col lg={8} className="mb-4">
+                <Col lg={12} className="mb-4">
                     <AnimatePresence mode="wait">
                         <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
                             {activeTab === 'overview' && (
@@ -230,7 +229,7 @@ const EventDetails = () => {
                                         </Col>
                                         <Col md={6} className="d-flex gap-3">
                                             <div className="bg-light p-3 rounded text-primary"><Users size={24}/></div>
-                                            <div><p className="text-muted small fw-bold text-uppercase mb-0">Max Capacity</p><p className="fw-medium mb-0">{event.venue?.capacity || 'Unlimited'} Attendees</p></div>
+                                            <div><p className="text-muted small fw-bold text-uppercase mb-0">Max Capacity</p><p className="fw-medium mb-0">{event.capacity || 'Unlimited'} Attendees</p></div>
                                         </Col>
                                     </Row>
                                     <hr className="my-4 opacity-10"/>
@@ -268,18 +267,7 @@ const EventDetails = () => {
                     </AnimatePresence>
                 </Col>
 
-                <Col lg={4}>
-                    <Card className="border-0 shadow-sm p-4 sticky-top" style={{ top: '20px' }}>
-                        <h5 className="fw-bold mb-3">Registration Status</h5>
-                        <div className="p-3 bg-light rounded text-center mb-4">
-                            <span className="text-success fw-bold">Open</span>
-                            <p className="text-muted small mb-0 mt-1">Closes in 5 Days</p>
-                        </div>
-                        <Button variant="primary" size="lg" className="w-100 py-3 rounded-pill fw-bold" onClick={() => setActiveTab('register')}>
-                            Join Event
-                        </Button>
-                    </Card>
-                </Col>
+
             </Row>
 
         </motion.div>

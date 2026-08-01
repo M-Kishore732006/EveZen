@@ -54,6 +54,14 @@ const EventManagement = () => {
     const handleSave = async (e) => {
         e.preventDefault();
         setError('');
+
+        if (formData.venue) {
+            const selectedVenue = venues.find(v => v._id === formData.venue);
+            if (selectedVenue && Number(formData.capacity) > selectedVenue.capacity) {
+                return setError(`Entered capacity exceeds the maximum capacity of the selected venue (${selectedVenue.capacity} attendees).`);
+            }
+        }
+
         try {
             const payload = { ...formData };
             if (payload.participationType === 'Individual') payload.teamSize = 1;
